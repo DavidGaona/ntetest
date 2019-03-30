@@ -15,6 +15,7 @@ import DropdownItem from 'react-bootstrap/DropdownItem'
 import { connect } from 'react-redux'
 import loginForm from '../redux/actions/loginForm'
 import isLogOut from '../redux/actions/isLogOut'
+import showDirectionsAction from '../redux/actions/showDirectionsAction'
 import showInfoAction from '../redux/actions/showInfoAction'
 
 import { withRouter } from 'react-router-dom'
@@ -27,6 +28,23 @@ class NavbarBlack extends Component {
         this.closeForm = this.closeForm.bind(this);
         this.logOut = this.logOut.bind(this);
         this.showInfo = this.showInfo.bind(this);
+        this.showDirForm = this.showDirForm.bind(this);
+    }
+
+    showDirForm(){
+        let dirs = [];
+        const storage = JSON.parse(localStorage.getItem('userInfo'));
+        const {showDirectionsAction,logged} = this.props;
+        axios.get(`http://localhost:8080/dirfav/profile/${logged.user.usuario.num_cel_u}`,{
+            headers: {
+                    Authorization: storage.token
+            }
+        }).then((res) => {
+                 const {showDirectionsAction} = this.props;
+                 showDirectionsAction(true,res.data);   
+                }).catch((err) => {
+                    console.log(err);
+                });    
     }
 
     showInfo(){
@@ -37,7 +55,11 @@ class NavbarBlack extends Component {
                     Authorization: storage.token
             }
         }).then((res) => {
-                    showInfoAction(true,res.data);    
+                    const respuesta = {
+                        ...res.data,
+                        role: storage.usuario.role    
+                    };
+                    showInfoAction(true,respuesta);    
                 }).catch((err) => {
                     showInfoAction(false,{});
                 });  
@@ -62,13 +84,14 @@ class NavbarBlack extends Component {
 
     render() {
         const {logged} = this.props;
+        console.log(logged);
         return (
             <Navbar className= "App-NavbarBlack" fixed="top" variant="dark">
             <Container>
                 <Brand href="/">NoThatEasyTaxi</Brand>
                 {logged.loggedIn ? <Nav className="mr-auto">
                 <DropdownButton drop={'down'} variant="warning" title={`${logged.user.usuario.nombre} ${logged.user.usuario.apellido}`} id="desplegable" key="down">
-                <DropdownItem eventKey="1" onClick={this.showInfo}>Perfil</DropdownItem><DropdownItem eventKey="2">Acerca de</DropdownItem></DropdownButton>
+                <DropdownItem eventKey="1" onClick={this.showInfo} active={false}>Perfil</DropdownItem>{logged.user.usuario.role === 'User'? <DropdownItem eventKey="2" onClick={this.showDirForm} active={false}>Modificar/Eliminar Direcciones Favoritas</DropdownItem>:<></>}</DropdownButton>
                 </Nav>: <Nav className="mr-auto">
                     <Link href="/#services">Servicios</Link>
                     <Link href="/#registro">Registro</Link>
@@ -94,7 +117,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
     isLogOut,
     loginForm,
-    showInfoAction
+    showInfoAction,
+    showDirectionsAction
 };
 
 

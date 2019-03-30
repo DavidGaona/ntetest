@@ -7,7 +7,7 @@ import MyInfo from './myInfo'
 import { connect } from 'react-redux'
 import Direcciones from './direcciones'
 import Mapa from './map'
-
+import MyDirections from './myDirections'
 
 class profileUser extends Component {
 
@@ -22,6 +22,7 @@ class profileUser extends Component {
             <header className="usuario_open">
                 <Container className="App-align-center">
                     <MyInfo></MyInfo>
+                    <MyDirections></MyDirections>
                     <Mapa></Mapa>
                     </Container>
                     <Direcciones></Direcciones>

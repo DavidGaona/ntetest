@@ -11,7 +11,11 @@ class Direcciones extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          direcciones: <h3>No hay direcciones para mostrar</h3>  
+          direcciones: <Carousel.Item>
+          <div className="App-box-services text-center">
+          <h3>No hay direcciones favoritas para mostrar</h3>
+          </div>
+        </Carousel.Item>  
         };
         this.getDir = this.getDir.bind(this);
         this.getDir();
@@ -36,9 +40,11 @@ class Direcciones extends Component {
                       </Carousel.Caption>
                   </Carousel.Item>)
                   );
-                  this.setState({
-                    direcciones: dirs 
-                  });    
+                  if(dirs.length != 0){
+                    this.setState({
+                      direcciones: dirs 
+                    });
+                  }    
                 }).catch((err) => {
                     console.log(err);
                 });  

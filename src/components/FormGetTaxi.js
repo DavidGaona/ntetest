@@ -16,8 +16,7 @@ class FormGetTaxi extends Component {
 
 
     render() {
-        const {dirDestino, dirOrigen} = this.props
-        console.log(this.props.dirDestino);
+        const {dirDestino, dirOrigen} = this.props;
         return (
             
             <Row>

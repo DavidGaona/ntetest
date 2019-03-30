@@ -25,7 +25,7 @@ class myInfo extends React.Component {
 
 
   render() {
-    const {showInfo} = this.props;   
+    const {showInfo} = this.props;  
     return (
         <>
         <Modal
@@ -47,7 +47,7 @@ class myInfo extends React.Component {
                       </Col>
                       <Col md={6}>
                         <Form.Group as={Row}>
-                          <Form.Label column sm="3">Usuario:</Form.Label>
+                          <Form.Label column sm="3">{showInfo.data.role === "User" ? "Usuario:" : "Taxista:"}</Form.Label>
                           <Col sm="9">
                           <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].nombre_completo}`: "ERROR"}</Form.Label>
                           </Col>
@@ -58,7 +58,12 @@ class myInfo extends React.Component {
                           <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].distancia_total_viajada}`: "ERROR"}</Form.Label>
                           </Col>
                         </Form.Group>
-
+                        {showInfo.data.role === "Taxista"?                         <Form.Group as={Row}>
+                          <Form.Label column sm="3">ID:  </Form.Label>
+                          <Col sm="9">
+                          <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].numero_de_identificacion}`: "ERROR"}</Form.Label>
+                          </Col>
+                        </Form.Group>:<></>}
                         <Form.Group as={Row} controlId="formPlaintextEmail">
                           <Form.Label column sm="3">Teléfono: </Form.Label>
                           <Col sm="9">
@@ -74,7 +79,7 @@ class myInfo extends React.Component {
                         <Form.Group as={Row} controlId="formPlaintextEmail">
                           <Form.Label column sm="3">Deuda</Form.Label>
                           <Col sm="9">
-                            <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].deuda}`: "ERROR"}</Form.Label>
+                            {showInfo.data.role === "User"?<Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].deuda}`: "ERROR"}</Form.Label>:<Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].saldo}`: "ERROR"}</Form.Label>}
                           </Col>
                         </Form.Group>
                       </Col>
