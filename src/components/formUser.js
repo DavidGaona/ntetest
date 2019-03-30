@@ -25,7 +25,9 @@ class FormUser extends Component {
             nameText: '',
             lastNameText: '',
             creditText: '',
-            passText: ''};
+            passText: '',
+            result: '',
+            sucess: false};
         this.onChanged = this.onChanged.bind(this);
         this.smShow = this.smShow.bind(this);
         this.smClose = this.smClose.bind(this);
@@ -79,21 +81,30 @@ class FormUser extends Component {
                 tc: this.state.creditText,
                 pass: this.state.passText
             }).then(res => {
-            console.log(res);
-            console.log(res.data);
+                this.setState({
+                    smShow: false,
+                    numText: '',
+                    nameText: '',
+                    lastNameText: '',
+                    creditText: '',
+                    passText: '',
+                    result: res.data.message,
+                    sucess: true
+                });
+                this.smShow();
         }).catch((error) => {
-            console.log(error.response);
+            this.setState({
+                smShow: false,
+                numText: '',
+                nameText: '',
+                lastNameText: '',
+                creditText: '',
+                passText: '',
+                result: 'Ha sucedido un error al momento de crear la cuenta \n'+`${error.response.data}`,
+                sucess: false
+            });
+            this.smShow();
         });
-        this.setState({
-            smShow: false,
-            numText: '',
-            nameText: '',
-            lastNameText: '',
-            creditText: '',
-            passText: ''
-        });
-        this.smShow();
-
     }
 
     smShow(){
@@ -106,7 +117,9 @@ class FormUser extends Component {
         this.setState({
             smShow:false
         });
-        this.openForm();
+        if(this.state.sucess){
+            this.openForm();    
+        }
     }
 
     openForm(){
@@ -128,7 +141,7 @@ class FormUser extends Component {
                             Aviso
                         </Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Se ha creado el usuario con exito. </Modal.Body>
+                    <Modal.Body> {this.state.result} </Modal.Body>
                     <Modal.Footer>
                         <Button variant="primary" onClick={this.smClose}>
                             Ok

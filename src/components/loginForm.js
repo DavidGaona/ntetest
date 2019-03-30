@@ -3,6 +3,7 @@ import '../App.css';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
+import Alert from 'react-bootstrap/Alert'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import isAuthenticated from "../redux/actions/isAuthenticated";
@@ -15,9 +16,12 @@ class LoginForm extends React.Component {
       super(props, context);
       this.log = this.log.bind(this);
       this.onChanged = this.onChanged.bind(this);
+      this.close = this.close.bind(this);
       this.state = {
         numText:'',
-        passText:''  
+        passText:'',
+        result: '',
+        notSucess: false  
       }
     }
 
@@ -54,7 +58,12 @@ class LoginForm extends React.Component {
           isAuthenticated(res.data);
           history.push('/profile');
       }).catch((error) => {
-          console.log(error.response);
+          this.setState({
+            numText:'',
+            passText:'',
+            result: '',
+            notSucess: true 
+          });
       })
 
       this.setState({
@@ -63,14 +72,27 @@ class LoginForm extends React.Component {
       });
     }
 
+    close(){
+      this.setState({
+        numText:'',
+        passText:'',
+        result: '',
+        notSucess: false  
+      });
+      this.props.closeLog();  
+    }
+
     render() {
       return (
         <>
-          <Modal show={this.props.showlog} onHide={this.props.closeLog}>
+          <Modal show={this.props.showlog} onHide={this.close}>
             <Modal.Header closeButton>
               <Modal.Title>Bienvenido</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+            {this.state.notSucess ? <Alert dismissible variant="danger">
+                    <Alert.Heading>Error al iniciar sesión, contraseña o usuario incorrecto</Alert.Heading>
+            </Alert>: <></>}  
             <Form>
                     <Form.Group controlId="formBasicEmail">
                         <Form.Label>Num de celular</Form.Label>
@@ -84,7 +106,7 @@ class LoginForm extends React.Component {
                     </Form>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={this.props.closeLog}>
+              <Button variant="secondary" onClick={this.close}>
                 Salir
               </Button>
               <Button variant="primary" onClick={this.log}>

@@ -15,7 +15,11 @@ class Signin extends Component {
         this.state = {text:''}
         this.onChanged = this.onChanged.bind(this);
         this.customForm = this.customForm.bind(this);
-        
+        const {authenticated} = this.props;
+
+        if(authenticated.loggedIn){
+            this.props.history.push('/profile');
+        }
     }
 
     onChanged(event){

@@ -25,8 +25,7 @@ class myInfo extends React.Component {
 
 
   render() {
-    const {showInfo} = this.props;
-    console.log(showInfo.data[0]);   
+    const {showInfo} = this.props;   
     return (
         <>
         <Modal
