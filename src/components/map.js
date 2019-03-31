@@ -28,8 +28,8 @@ class Mapa extends Component {
       selectedOption: null,
       options: [],
       info: [],
-      dirDestino: '',
-      dirOrigen: '',
+      dirDestino: {},
+      dirOrigen: {},
     }
     this.changePosition = this.changePosition.bind(this);
     this.showPosition = this.showPosition.bind(this);
@@ -79,7 +79,12 @@ class Mapa extends Component {
   addOrigen() {
     axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.state.lat}&lon=${this.state.lng}`, {
     }).then((res) => {
-      this.setState({dirOrigen: res.data.display_name});
+      this.setState({dirOrigen: {
+        name: res.data.display_name,
+        lat: res.data.lat,
+        ln: res.data.lon  
+      }
+    });
     }).catch((err) => {
       console.log(err);
     });
@@ -88,7 +93,12 @@ class Mapa extends Component {
   addDestino() {
     axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.state.lat}&lon=${this.state.lng}`, {
     }).then((res) => {
-      this.setState({dirDestino: res.data.display_name});
+      this.setState({dirDestino: {
+        name: res.data.display_name,
+        lat: res.data.lat,
+        ln: res.data.lon  
+      }
+    });
     }).catch((err) => {
       console.log(err);
     });
@@ -129,7 +139,7 @@ class Mapa extends Component {
           </Col>
 
           <Col md={4}>
-            <FormGetTaxi dirOrigen= {this.state.dirOrigen} dirDestino={this.state.dirDestino}></FormGetTaxi>
+            <FormGetTaxi dirOrigen={this.state.dirOrigen} dirDestino={this.state.dirDestino}></FormGetTaxi>
           </Col>
         </Row>
 
