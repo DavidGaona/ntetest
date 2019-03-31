@@ -17,14 +17,35 @@ class LoginForm extends React.Component {
       this.log = this.log.bind(this);
       this.onChanged = this.onChanged.bind(this);
       this.close = this.close.bind(this);
+      this.changeRole = this.changeRole.bind(this);
       this.state = {
         numText:'',
         passText:'',
         result: '',
-        notSucess: false  
+        notSucess: false,
+        role: 'Usuario'  
       }
     }
 
+    changeRole(role){
+      switch(role){
+        case 'Usuario':
+          this.setState({
+            role: 'Taxista'
+          });
+          break;
+        case 'Taxista':
+        this.setState({
+          role: 'Usuario'
+        });
+        break;
+        default:
+          this.setState({
+            ...this.state
+          });    
+      }
+        
+    }
 
     onChanged(event,name) {
         let textR = event.target.value
@@ -46,7 +67,8 @@ class LoginForm extends React.Component {
 
     log(){
       
-      axios.post('http://localhost:8080/login',
+      if(this.state.role === 'Usuario'){
+        axios.post('http://localhost:8080/login/user',
       {
           num: this.state.numText,
           pass: this.state.passText
@@ -69,7 +91,34 @@ class LoginForm extends React.Component {
       this.setState({
         numText: '',
         passText: ''
-      });
+      });  
+      }else{
+        axios.post('http://localhost:8080/login/driver',
+      {
+          id_taxista: this.state.numText,
+          pass: this.state.passText
+      }).then(res => {
+          const {
+            isAuthenticated,
+            history, 
+          } = this.props;
+          isAuthenticated(res.data);
+          history.push('/profile');
+      }).catch((error) => {
+          this.setState({
+            numText:'',
+            passText:'',
+            result: '',
+            notSucess: true 
+          });
+      })
+
+      this.setState({
+        numText: '',
+        passText: ''
+      });  
+      }
+      
     }
 
     close(){
@@ -87,7 +136,7 @@ class LoginForm extends React.Component {
         <>
           <Modal show={this.props.showlog} onHide={this.close}>
             <Modal.Header closeButton>
-              <Modal.Title>Bienvenido</Modal.Title>
+              <Modal.Title>{`Bienvenido: ${this.state.role}`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
             {this.state.notSucess ? <Alert dismissible variant="danger">
@@ -95,8 +144,8 @@ class LoginForm extends React.Component {
             </Alert>: <></>}  
             <Form>
                     <Form.Group controlId="formBasicEmail">
-                        <Form.Label>Num de celular</Form.Label>
-                        <Form.Control placeholder="Digite su numero celular registrado" onChange={event => this.onChanged(event,'numCel')} value={this.state.numText}/>
+                        <Form.Label>{this.state.role === 'Usuario'?"Num de celular":"ID"}</Form.Label>
+                        <Form.Control placeholder={this.state.role === 'Usuario'?"Digite su num celular":"Digite su ID"} onChange={event => this.onChanged(event,'numCel')} value={this.state.numText}/>
                     </Form.Group>
 
                     <Form.Group controlId="formBasicPassword">
@@ -106,6 +155,11 @@ class LoginForm extends React.Component {
                     </Form>
             </Modal.Body>
             <Modal.Footer>
+            {this.state.role === 'Usuario'?<Button variant="primary" onClick={(e) => this.changeRole(this.state.role)}>
+                Taxista
+              </Button>:<Button variant="primary" onClick={(e) => this.changeRole(this.state.role)}>
+                Usuario
+              </Button>}
               <Button variant="secondary" onClick={this.close}>
                 Salir
               </Button>

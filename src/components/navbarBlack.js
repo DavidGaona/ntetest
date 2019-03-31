@@ -50,7 +50,8 @@ class NavbarBlack extends Component {
     showInfo(){
         const storage = JSON.parse(localStorage.getItem('userInfo'));
         const {showInfoAction,logged} = this.props;
-        axios.get(`http://localhost:8080/profile/${logged.user.usuario.num_cel_u}`,{
+        if(logged.user.usuario){
+            axios.get(`http://localhost:8080/profile/${logged.user.usuario.num_cel_u}`,{
             headers: {
                     Authorization: storage.token
             }
@@ -62,7 +63,22 @@ class NavbarBlack extends Component {
                     showInfoAction(true,respuesta);    
                 }).catch((err) => {
                     showInfoAction(false,{});
-                });  
+                });    
+        }else{
+            axios.get(`http://localhost:8080/taxista/${logged.user.taxista.idTaxista}`,{
+            headers: {
+                    Authorization: storage.token
+            }
+        }).then((res) => {
+                    const respuesta = {
+                        ...res.data,
+                        role: storage.taxista.role    
+                    };
+                    showInfoAction(true,respuesta);    
+                }).catch((err) => {
+                    showInfoAction(false,{});
+                });    
+        }  
     }
 
     openForm(){
@@ -84,14 +100,13 @@ class NavbarBlack extends Component {
 
     render() {
         const {logged} = this.props;
-        console.log(logged);
         return (
             <Navbar className= "App-NavbarBlack" fixed="top" variant="dark">
             <Container>
                 <Brand href="/">NoThatEasyTaxi</Brand>
                 {logged.loggedIn ? <Nav className="mr-auto">
-                <DropdownButton drop={'down'} variant="warning" title={`${logged.user.usuario.nombre} ${logged.user.usuario.apellido}`} id="desplegable" key="down">
-                <DropdownItem eventKey="1" onClick={this.showInfo} active={false}>Perfil</DropdownItem>{logged.user.usuario.role === 'User'? <DropdownItem eventKey="2" onClick={this.showDirForm} active={false}>Modificar/Eliminar Direcciones Favoritas</DropdownItem>:<></>}</DropdownButton>
+                <DropdownButton drop={'down'} variant="warning" title={logged.user.usuario?`${logged.user.usuario.nombre} ${logged.user.usuario.apellido}`:`${logged.user.taxista.nombre} ${logged.user.taxista.apellido}`} id="desplegable" key="down">
+                <DropdownItem eventKey="1" onClick={this.showInfo} active={false}>Perfil</DropdownItem>{logged.user.usuario? <DropdownItem eventKey="2" onClick={this.showDirForm} active={false}>Modificar/Eliminar Direcciones Favoritas</DropdownItem>:<></>}</DropdownButton>
                 </Nav>: <Nav className="mr-auto">
                     <Link href="/#services">Servicios</Link>
                     <Link href="/#registro">Registro</Link>

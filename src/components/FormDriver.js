@@ -10,15 +10,49 @@ import Card from 'react-bootstrap/Card'
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Tooltip from 'react-bootstrap/Tooltip'
 import axios from "axios";
-
+import { connect } from 'react-redux';
+import loginForm from '../redux/actions/loginForm'
+import Modal from 'react-bootstrap/Modal'
 
 class FormDriver extends Component {
 
     //Propiedades
     constructor(props) {
         super(props);
-        this.state = { text: '' };
+        this.state = {
+            nombreText:'',
+            apellidoText:'',
+            celText:'',
+            cuentaText:'',
+            cedulaText:'',
+            passText:'',
+            result: '',
+            sucess: false
+        };
         this.onChanged = this.onChanged.bind(this);
+        this.smShow = this.smShow.bind(this);
+        this.smClose = this.smClose.bind(this);
+        this.openForm = this.openForm.bind(this);
+    }
+
+    openForm(){
+        const { loginForm } = this.props;
+        loginForm(true);
+    }
+
+    smShow(){
+        this.setState({
+            smShow:true
+        })
+    }
+
+    smClose(){
+        this.setState({
+            smShow:false
+        });
+        if(this.state.sucess){
+            this.openForm();    
+        }
     }
 
     //Evento controlador de solo ingreso de números
@@ -65,7 +99,7 @@ class FormDriver extends Component {
         }
     }
 
-    registrarTaxista = (e) => {
+    submitForm(e){
         e.preventDefault();
         axios.post('http://localhost:8080/signin/driver',
             {
@@ -76,10 +110,28 @@ class FormDriver extends Component {
                 password_t: this.state.passText,
                 num_cuenta: this.state.cuentaText
             }).then(res => {
-            console.log(res);
-            console.log(res.data);
+                this.setState({
+                    smShow: false,
+                    numText: '',
+                    nameText: '',
+                    lastNameText: '',
+                    creditText: '',
+                    passText: '',
+                    result: res.data.message,
+                    sucess: true
+                });
+                this.smShow();
         }).catch((error) => {
-            console.log(error.response);
+            this.setState({
+                smShow: false,
+                numText: '',
+                nameText: '',
+                lastNameText: '',
+                creditText: '',
+                passText: '',
+                result: 'Ha sucedido un error al momento de crear la cuenta \n'+`${error.response.data}`,
+                sucess: false
+            });
         });
         this.setState({
             nombreText: '',
@@ -95,6 +147,24 @@ class FormDriver extends Component {
     render() {
         return (
             <header className="App-header-signDriver">
+            <Modal
+                    size="sm"
+                    show={this.state.smShow}
+                    onHide={this.smClose}
+                    aria-labelledby="example-modal-sizes-title-sm"
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title id="example-modal-sizes-title-sm">
+                            Aviso
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body> {this.state.result} </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={this.smClose}>
+                            Ok
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
                 <Container>
                     <Row>
                         <Col md={6} style={{textAlign: 'initial'}}>
@@ -108,7 +178,7 @@ class FormDriver extends Component {
                             <Card text="info">
                                 <Card.Header>Formulario de Conductor</Card.Header>
                                 <Card.Body>
-                                    <Form onSubmit={(e) => this.registrarTaxista(e)}>
+                                    <Form onSubmit={(e) => this.submitForm(e)}>
                                         <Form.Row>
                                             <Form.Group as={Col} controlId="FormGridName">
                                                 <Form.Label>Nombre</Form.Label>
@@ -173,5 +243,12 @@ class FormDriver extends Component {
         );
     }
 }
+const mapDispatchToProps = {
+    loginForm
+};
 
-export default FormDriver;
+const mapStateToProps = state => ({
+    ...state
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(FormDriver);

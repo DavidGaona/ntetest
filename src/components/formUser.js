@@ -228,8 +228,7 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = state => ({
-    ...state,
-    showlog: state.activarLogin
+    ...state
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FormUser);

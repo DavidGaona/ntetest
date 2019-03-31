@@ -116,6 +116,49 @@
   width: 100%;  
 }
 
+.App-header-mainTaxi{
+  background-image: url("../src/img/map-D2x_v2.webp");
+  width: 100%;
+  height: auto;
+  padding-bottom: 150px;
+  padding-top: 110px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.boton-redondo{
+  width:250px;
+  height:250px;
+  background-color:#ee7626 !important;
+  margin: 5px !important;
+  padding:10px !important;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 200px !important;
+  font-size:18px !important;
+  line-height:32px !important;
+  text-transform: uppercase !important;
+  float:left;
+}
+.boton-redondo-gris{
+width:250px;
+height:250px;
+background-color:#b6b4b3 !important;
+margin: 5px !important;
+padding:10px !important;
+-webkit-border-radius: 50px;
+-moz-border-radius: 50px;
+border-radius: 200px !important;
+font-size:18px !important;
+line-height:32px !important;
+text-transform: uppercase !important;
+float:left;
+}
+.App-padding-top{
+  padding-top: 100px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

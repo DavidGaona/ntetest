@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import ProfileUser from '../components/profileUser'
+import ProfileDriver from '../components/profileDriver'
 
 class Profile extends Component {
 
@@ -13,10 +14,18 @@ class Profile extends Component {
     }
   }
 
-  render() {   
-    return(<ProfileUser></ProfileUser>);
+  render() {
+    const {authenticated} = this.props;  
+    return customProfile(authenticated.user)
   }
 }
+
+const customProfile = (role) => {
+  if(role.usuario){
+    return(<ProfileUser></ProfileUser>);
+  }
+    return(<ProfileDriver></ProfileDriver>);
+};
 
 const mapStateToProps = state => ({
     ...state,
