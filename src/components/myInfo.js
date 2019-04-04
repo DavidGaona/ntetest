@@ -92,7 +92,14 @@ class myInfo extends React.Component {
                             <i className="fas fa-trash-alt fa-4x"></i>
                             Eliminar cuenta</Button>
                           </ButtonGroup>
-                          
+                          <ButtonGroup vertical>
+                          <br />
+                          <br />
+                          <br />
+                          <Button variant="success" onClick={this.pagarDeuda}>
+                          <i class="fas fa-money-check-alt fa-3x"></i>
+                            {showInfo.data.role === "User"? "Pagar":"Cobrar"}</Button>
+                        </ButtonGroup>
 
                       </Col>
                     </Row>

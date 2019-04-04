@@ -4,6 +4,8 @@ import axios from 'axios';
 //importo componentes para formulario
 import Carousel from 'react-bootstrap/Carousel'
 import { connect } from 'react-redux'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Popover from 'react-bootstrap/Popover'
 
 class Direcciones extends Component {
 
@@ -25,7 +27,7 @@ class Direcciones extends Component {
       let dirs = [];
       const storage = JSON.parse(localStorage.getItem('userInfo'));
         const {showInfoAction,logged} = this.props;
-        axios.get(`http://localhost:8080/dirfav/profile/${logged.user.usuario.num_cel_u}`,{
+        axios.get(`http://localhost:8080/profile/dirfav/${logged.user.usuario.num_cel_u}`,{
             headers: {
                     Authorization: storage.token
             }
@@ -33,12 +35,41 @@ class Direcciones extends Component {
                   dirs = res.data.map((value,index) => 
                   (<Carousel.Item key={index}>
                     <div className="App-box-services text-center">
-                    <i className="fas fa-map-marker fa-7x"></i>
+                    <OverlayTrigger
+                      trigger="hover"
+                      key="right"
+                      placement="right"
+                      overlay={
+                        <Popover
+                          id="dir-popup"
+                          title="Direcciones información"
+                        >
+                          <strong>Para mostrar mas opciones, presionar sobre el nombre de la dirección </strong>
+                        </Popover>
+                      }
+                    >
+                    <i className="fas fa-map-marker fa-7x"></i>  
+                    </OverlayTrigger>
                     </div>
                       <Carousel.Caption>
-                        <h3>{value.nombre_dir}</h3>
+                        
+                        <OverlayTrigger
+                      trigger="click"
+                      key="top"
+                      placement="top"
+                      overlay={
+                        <Popover
+                          id="dir-on-click-popup"
+                          title="Escoger una de las opciones: "
+                        >
+                          <strong>Para mostrar mas opciones, presionar sobre el nombre de la dirección </strong>
+                        </Popover>
+                      }
+                    >
+                    <h3>{value.nombre_dir}</h3>  
+                    </OverlayTrigger>
                       </Carousel.Caption>
-                  </Carousel.Item>)
+                    </Carousel.Item>)
                   );
                   if(dirs.length != 0){
                     this.setState({
@@ -46,13 +77,12 @@ class Direcciones extends Component {
                     });
                   }    
                 }).catch((err) => {
-                    console.log(err);
+                    console.log(err.response);
                 });  
     }
 
     render() {
         return (
-            
             <Carousel wrap={false} interval={null}>
             {this.state.direcciones}
             </Carousel>

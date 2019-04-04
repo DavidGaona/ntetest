@@ -17,7 +17,7 @@ import loginForm from '../redux/actions/loginForm'
 import isLogOut from '../redux/actions/isLogOut'
 import showDirectionsAction from '../redux/actions/showDirectionsAction'
 import showInfoAction from '../redux/actions/showInfoAction'
-
+import Form from 'react-bootstrap/Form'
 import { withRouter } from 'react-router-dom'
 
 class NavbarBlack extends Component {
@@ -29,22 +29,56 @@ class NavbarBlack extends Component {
         this.logOut = this.logOut.bind(this);
         this.showInfo = this.showInfo.bind(this);
         this.showDirForm = this.showDirForm.bind(this);
+        this.searchDir = this.searchDir.bind(this);
     }
 
-    showDirForm(){
+
+    searchDir(lat,ln){
+        
+        return axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${ln}`, {
+        }).then((res) => {
+          return res.data.display_name; 
+        }).catch((err) => {
+          console.log(err);
+        });    
+    }
+    
+
+    async showDirForm(){
         let dirs = [];
         const storage = JSON.parse(localStorage.getItem('userInfo'));
         const {showDirectionsAction,logged} = this.props;
-        axios.get(`http://localhost:8080/dirfav/profile/${logged.user.usuario.num_cel_u}`,{
+        axios.get(`http://localhost:8080/profile/dirfav/${logged.user.usuario.num_cel_u}`,{
             headers: {
                     Authorization: storage.token
             }
         }).then((res) => {
-                 const {showDirectionsAction} = this.props;
-                 showDirectionsAction(true,res.data);   
+                 dirs = res.data.map(async (value,index) => {
+                    const name = await this.searchDir(value.coords_gps_u.x,value.coords_gps_u.y);
+                    console.log(name);
+                    return(<tr key={index}>
+                    <td>
+                      {['checkbox'].map(type => (
+                        <div key={`custom-inline-${type}`} className="mb-3">
+                          <Form.Check
+                            custom
+                            inline
+                            label=""
+                            type={type}
+                            id={`custom-inline-${type}-1`}
+                          />
+                        </div>
+                      ))}
+                    </td>
+                    <td>{value.nombre_dir}</td>
+                    <td>{name}</td>
+                    </tr>)                  
+                 });
+                    showDirectionsAction(true, dirs); 
                 }).catch((err) => {
-                    console.log(err);
-                });    
+                    return showDirectionsAction(true,[]);
+                });
+
     }
 
     showInfo(){
@@ -122,6 +156,9 @@ class NavbarBlack extends Component {
 
 
 }
+
+
+
 
 const mapStateToProps = state => ({
     ...state,

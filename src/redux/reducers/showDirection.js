@@ -1,5 +1,5 @@
 import {type as showDirectionsAction} from '../actions/showDirectionsAction'
-const defaultState = {show: false, data: {}};
+const defaultState = {show: false, data: []};
 
 function reducer(state = defaultState, {type, payload}){
     switch(type){
@@ -15,7 +15,7 @@ function reducer(state = defaultState, {type, payload}){
         
         return {
             show:false,
-            data: {}
+            data: []
         }
 
         default: 

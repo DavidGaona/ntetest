@@ -3,11 +3,9 @@ import '../App.css';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import { connect } from 'react-redux'
 import showDirectionsAction from '../redux/actions/showDirectionsAction'
+import Table from 'react-bootstrap/Table'
 
 class MyDirections extends React.Component {
 
@@ -15,17 +13,29 @@ class MyDirections extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.handleClose = this.handleClose.bind(this);
+    this.state = {
+      info: []
+    };
   }
 
 
+componentWillReceiveProps(nextProps){
+  const {showDirection} = nextProps;
+  Promise.all(showDirection.data).then((valores)=>{ 
+    this.setState({
+      info: valores
+    });
+  })   
+}  
+
   handleClose() {
     const {showDirectionsAction} = this.props;
-    showDirectionsAction(false,{});    
+    showDirectionsAction(false,[]);    
   }
 
 
   render() {
-    const {showDirection} = this.props;  
+    const {showDirection} = this.props; 
     return (
         <>
         <Modal
@@ -38,27 +48,25 @@ class MyDirections extends React.Component {
           </Modal.Header>
           <Modal.Body>
             <Form>
-              <div>
-                <Row>
-                  <Col md={12}>
-                    <Row>
-                      <Col md={3}>
-                        <i className="fas fa-user fa-7x"></i>
-                      </Col>
-                      <Col md={6}>
-                        <Form.Group as={Row}>
-                          <Form.Label column sm="3">Usuario: </Form.Label>
-                          <Col sm="9">
-                          <Form.Label column sm="3">{}</Form.Label>
-                          </Col>
-                        </Form.Group>
-                      </Col>
-                      <Col md={3}>                          
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </div>
+            <Table responsive>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Nombre</th>
+                    <th>Dirección favorita</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {this.state.info === 0?
+                                                  <tr>
+                                                    <td>Error</td>
+                                                    <td>Error</td>
+                                                    <td>Error</td>
+                                                  </tr>:this.state.info}  
+                </tbody>
+              </Table>
+              <Button variant="primary"><i className="fas fa-tools fa-3x"></i>Modificar</Button>
+              <Button variant="danger"><i className="fas fa-trash fa-3x"></i>Eliminar</Button>
             </Form>
           </Modal.Body>
             <Modal.Footer>

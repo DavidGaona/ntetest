@@ -4,9 +4,10 @@ import axios from 'axios'
 //importo componentes para formulario
 import { connect } from 'react-redux'
 import Form from 'react-bootstrap/Form'
-import Row from 'react-bootstrap/Row';
+import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
+
 class FormGetTaxi extends Component {
 
     //Propiedades
@@ -43,9 +44,8 @@ class FormGetTaxi extends Component {
     }
 
     render() {
-        const {dirDestino, dirOrigen} = this.props;
+        const {dirOrigen,dirDestino} = this.props;
         return (
-            
             <Row>
                 <Col md={12}>
                     <Form className="text-left text-white">
@@ -73,8 +73,7 @@ class FormGetTaxi extends Component {
 }
 
 const mapStateToProps = state => ({
-    ...state,
-    logged: state.authenticated    
+    logged: state.authenticated 
 });
 
 

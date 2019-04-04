@@ -9,6 +9,14 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container';
 import FormGetTaxi from './FormGetTaxi'
+import { connect } from 'react-redux'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Form from 'react-bootstrap/Form'
+import Popover from 'react-bootstrap/Popover'
+import Button from 'react-bootstrap/Button'
+import updateDesde from '../redux/actions/updateDesde'
+import updateHasta from '../redux/actions/updateHasta'
+
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
@@ -28,8 +36,7 @@ class Mapa extends Component {
       selectedOption: null,
       options: [],
       info: [],
-      dirDestino: {},
-      dirOrigen: {},
+      name: ''
     }
     this.changePosition = this.changePosition.bind(this);
     this.showPosition = this.showPosition.bind(this);
@@ -37,7 +44,29 @@ class Mapa extends Component {
     this.inputChange = this.inputChange.bind(this);
     this.addOrigen = this.addOrigen.bind(this);
     this.addDestino = this.addDestino.bind(this);
+    this.onChanged = this.onChanged.bind(this);
     navigator.geolocation.getCurrentPosition(this.showPosition);
+  }
+
+  onChanged(e){
+    this.setState({
+      name: e.target.value
+    });  
+  }  
+
+
+   submitForm(e){
+    e.preventDefault();
+    const {logged} = this.props;
+    axios.post('http://localhost:8080/profile/dirfav',{
+      cel: logged.user.usuario.num_cel_u,
+      nombre: this.state.name,
+      coords: `(${this.state.lat},${this.state.lng})`
+    }).then(res => {
+      console.log(res.data);
+    }).catch(err => {
+      console.log(err.response);
+    });
   }
 
 
@@ -77,28 +106,28 @@ class Mapa extends Component {
   }
 
   addOrigen() {
+    const {updateDesde} = this.props;
     axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.state.lat}&lon=${this.state.lng}`, {
     }).then((res) => {
-      this.setState({dirOrigen: {
+      updateDesde({
         name: res.data.display_name,
         lat: res.data.lat,
         ln: res.data.lon  
-      }
-    });
+      }); 
     }).catch((err) => {
       console.log(err);
     });
   }
 
   addDestino() {
+    const {updateHasta} = this.props;
     axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.state.lat}&lon=${this.state.lng}`, {
     }).then((res) => {
-      this.setState({dirDestino: {
+      updateHasta({
         name: res.data.display_name,
         lat: res.data.lat,
         ln: res.data.lon  
-      }
-    });
+      });
     }).catch((err) => {
       console.log(err);
     });
@@ -114,9 +143,8 @@ class Mapa extends Component {
 
   render() {
     const position = [this.state.lat, this.state.lng];
+    const {origen, destino} = this.props;
     return (
-      
-
       <Container className="map-container">
         <Row>
           <Col md={8}>
@@ -131,7 +159,20 @@ class Mapa extends Component {
                   <div>
                     <p> ¿Desea poner el marcador en esta dirección? <br /> Presione los botones para seleccionar el origen y destino</p>
                     <button className="btn btn-primary" onClick={this.addOrigen}>Desde</button>
-                    <button className="btn btn-success" onClick={this.addDestino}>Hasta</button>
+                    <button className="btn btn-primary" onClick={this.addDestino}>Hasta</button>
+                    <OverlayTrigger trigger="click" placement="right" overlay={<Popover id="popover-basic" title="Nombre del lugar que desea agregar como favorito">
+                                                                                <Form onSubmit={(e) => this.submitForm(e)}>
+                                                                                <Form.Group controlId="formGroupEmail">
+                                                                                  <Form.Label> Digite por favor el nombre del lugar</Form.Label>
+                                                                                  <Form.Control type="text" placeholder="Cualquier nombre..." onChange={this.onChanged}/>
+                                                                                </Form.Group>
+                                                                                <Button variant="outline-primary" type="submit">
+                                                                                  Guardar
+                                                                                </Button>   
+                                                                                </Form>                                          
+                                                                                </Popover>}>
+                    <button className="btn btn-success"> Agregar a favoritos</button>
+                    </OverlayTrigger>
                   </div>
                 </Popup>
               </Marker>
@@ -139,7 +180,7 @@ class Mapa extends Component {
           </Col>
 
           <Col md={4}>
-            <FormGetTaxi dirOrigen={this.state.dirOrigen} dirDestino={this.state.dirDestino}></FormGetTaxi>
+            <FormGetTaxi dirOrigen={origen.dirOrigen} dirDestino={destino.dirHasta}></FormGetTaxi>
           </Col>
         </Row>
 
@@ -158,6 +199,17 @@ class Mapa extends Component {
       </Container>);
   }
 }
+    
+const mapDispatchToProps = {
+  updateHasta,
+  updateDesde 
+};
 
 
-export default Mapa;
+const mapStateToProps = state => ({
+  logged: state.authenticated,
+  origen: state.desdeDir,
+  destino: state.hastaDir
+});
+
+export default connect(mapStateToProps,mapDispatchToProps)(Mapa);

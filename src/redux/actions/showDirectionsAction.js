@@ -1,6 +1,8 @@
 export const type = 'showDirectionsAction';
 
+
 const showDirectionsAction = (flag,res) => {
+    
     if(flag){
         return( 
         {

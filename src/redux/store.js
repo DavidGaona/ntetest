@@ -3,12 +3,16 @@ import activarLogin from './reducers/activarLogin'
 import authenticated from './reducers/authenticated'
 import showInfo from './reducers/showInfo'
 import showDirection from './reducers/showDirection'
+import desdeDir from './reducers/desdeDir'
+import hastaDir from './reducers/hastaDir'
 
 const reducer = combineReducers({
     activarLogin,
     authenticated,
     showInfo,
-    showDirection
+    showDirection,
+    desdeDir,
+    hastaDir
 });
 
 const store = createStore(reducer);
