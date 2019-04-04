@@ -162,7 +162,7 @@ class Mapa extends Component {
                     <button className="btn btn-primary" onClick={this.addDestino}>Hasta</button>
                     <OverlayTrigger trigger="click" placement="right" overlay={<Popover id="popover-basic" title="Nombre del lugar que desea agregar como favorito">
                                                                                 <Form onSubmit={(e) => this.submitForm(e)}>
-                                                                                <Form.Group controlId="formGroupEmail">
+                                                                                <Form.Group controlId="formGroupDirFav">
                                                                                   <Form.Label> Digite por favor el nombre del lugar</Form.Label>
                                                                                   <Form.Control type="text" placeholder="Cualquier nombre..." onChange={this.onChanged}/>
                                                                                 </Form.Group>

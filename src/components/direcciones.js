@@ -6,6 +6,9 @@ import Carousel from 'react-bootstrap/Carousel'
 import { connect } from 'react-redux'
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Popover from 'react-bootstrap/Popover'
+import Button from 'react-bootstrap/Button'
+import updateDesde from '../redux/actions/updateDesde'
+import updateHasta from '../redux/actions/updateHasta'
 
 class Direcciones extends Component {
 
@@ -13,6 +16,7 @@ class Direcciones extends Component {
     constructor(props) {
         super(props);
         this.state = {
+          infoDirs: [],
           direcciones: <Carousel.Item>
           <div className="App-box-services text-center">
           <h3>No hay direcciones favoritas para mostrar</h3>
@@ -20,13 +24,45 @@ class Direcciones extends Component {
         </Carousel.Item>  
         };
         this.getDir = this.getDir.bind(this);
+        this.ponerDesde = this.ponerDesde.bind(this);
+        this.ponerHasta = this.ponerHasta.bind(this);
         this.getDir();
+    }
+
+    ponerDesde(e){
+      const {updateDesde} = this.props;
+      const {lat,lng} = {lat: this.state.infoDirs[e.target.id].coords_gps_u.x,lng: this.state.infoDirs[e.target.id].coords_gps_u.y};
+        axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+        }).then((res) => {
+          updateDesde({
+            name: res.data.display_name,
+            lat: res.data.lat,
+            ln: res.data.lon  
+          }); 
+        }).catch((err) => {
+          console.log(err);
+        });
+    }
+
+    ponerHasta(e){
+      const {updateHasta} = this.props;
+      const {lat,lng} = {lat: this.state.infoDirs[e.target.id].coords_gps_u.x,lng: this.state.infoDirs[e.target.id].coords_gps_u.y};
+        axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+        }).then((res) => {
+          updateHasta({
+            name: res.data.display_name,
+            lat: res.data.lat,
+            ln: res.data.lon  
+          }); 
+        }).catch((err) => {
+          console.log(err);
+        });    
     }
 
     getDir(){
       let dirs = [];
       const storage = JSON.parse(localStorage.getItem('userInfo'));
-        const {showInfoAction,logged} = this.props;
+        const {logged} = this.props;
         axios.get(`http://localhost:8080/profile/dirfav/${logged.user.usuario.num_cel_u}`,{
             headers: {
                     Authorization: storage.token
@@ -61,8 +97,13 @@ class Direcciones extends Component {
                         <Popover
                           id="dir-on-click-popup"
                           title="Escoger una de las opciones: "
-                        >
-                          <strong>Para mostrar mas opciones, presionar sobre el nombre de la dirección </strong>
+                        >  
+                          <Button variant="outline-primary" onClick={this.ponerDesde} id={index}>
+                          Desde   
+                          </Button>
+                          <Button variant="outline-primary" onClick={this.ponerHasta} id={index}>
+                          Hasta   
+                          </Button>     
                         </Popover>
                       }
                     >
@@ -73,6 +114,7 @@ class Direcciones extends Component {
                   );
                   if(dirs.length != 0){
                     this.setState({
+                      infoDirs: res.data,
                       direcciones: dirs 
                     });
                   }    
@@ -90,10 +132,15 @@ class Direcciones extends Component {
     }
 }
 
+const mapDispatchToProps = {
+  updateHasta,
+  updateDesde 
+};
+
 const mapStateToProps = state => ({
     ...state,
     logged: state.authenticated 
 });
 
 
-export default connect(mapStateToProps)(Direcciones);
+export default connect(mapStateToProps,mapDispatchToProps)(Direcciones);
