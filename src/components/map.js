@@ -63,9 +63,10 @@ class Mapa extends Component {
       nombre: this.state.name,
       coords: `(${this.state.lat},${this.state.lng})`
     }).then(res => {
-      console.log(res.data);
+      alert("Dirección guardada con éxito")
     }).catch(err => {
-      console.log(err.response);
+      let message = "Se ha producido el siguiente error: "+err.response.data;
+      alert(message);
     });
   }
 

@@ -8,6 +8,9 @@ import Col from 'react-bootstrap/Col'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import { connect } from 'react-redux'
 import showInfoAction from '../redux/actions/showInfoAction'
+import isAuthenticated from '../redux/actions/isAuthenticated'
+import axios from 'axios'
+
 
 class myInfo extends React.Component {
 
@@ -15,8 +18,80 @@ class myInfo extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.handleClose = this.handleClose.bind(this);
+    this.handlerChange = this.handlerChange.bind(this);
+    this.saveChanges = this.saveChanges.bind(this);
+    this.state = {
+      textNombre: '',
+      textApellido: '',
+      modif: false  
+    }
   }
 
+  saveChanges(e){
+    const {showInfo,isAuthenticated,showInfoAction} = this.props;
+    const storage = JSON.parse(localStorage.getItem('userInfo'));
+    e.preventDefault();
+    let r = window.confirm("¿Desea guardar los cambios?");  
+    if(r){
+      axios.put('http://localhost:8080/profile/updateUser',{
+        cel: showInfo.data[0].numero_de_celular,
+        nombre: this.state.textNombre,
+        apellido: this.state.textApellido
+      },{headers: {Authorization: storage.token}})
+      .then((res) =>{
+        window.alert("Usuario actualizado con éxito");
+        const usuario = {
+          num_cel_u: showInfo.data[0].numero_de_celular,
+          nombre: this.state.textNombre,
+          apellido: this.state.textApellido,
+          role: storage.usuario.role
+        }
+
+        isAuthenticated({
+          ok: true,
+          token: storage.token,
+          usuario   
+        });
+        
+        this.setState({
+          textNombre: '',
+          textApellido: '',
+          modif: false
+        });
+
+        showInfoAction(false,{});
+
+      })
+      .catch((err) => {
+        console.log(err.response.data);  
+      })
+    }else{
+      this.setState({
+        textNombre: '',
+        textApellido: '',
+        modif: false  
+      });
+    }
+
+  }
+
+  handlerChange(e){
+    const textR = e.target.value;
+    const id = e.target.id;
+    switch(id){
+      case 'nombre':
+        this.setState({
+          textNombre: textR   
+        });
+        break;
+       
+      case 'apellido':
+        this.setState({
+          textApellido: textR
+        });
+        break;  
+    }      
+  }
 
   handleClose() {
     const {showInfoAction} = this.props;
@@ -49,45 +124,47 @@ class myInfo extends React.Component {
                         <Form.Group as={Row}>
                           <Form.Label column sm="3">{showInfo.data.role === "User" ? "Usuario:" : "Taxista:"}</Form.Label>
                           <Col sm="9">
-                          <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].nombre_completo}`: "ERROR"}</Form.Label>
+                          {this.state.modif?<Form.Control placeholder="Escriba nuevo nombre..." value={this.state.textNombre} onChange={this.handlerChange} id='nombre'></Form.Control>:<Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].nombre_completo}`: ""}</Form.Label>}
+                          {this.state.modif?<Form.Control placeholder="Escriba nuevo apellido..." value={this.state.textApellido} onChange={this.handlerChange} id='apellido'></Form.Control>:<></>}
                           </Col>
                         </Form.Group>
                         <Form.Group as={Row}>
                           <Form.Label column sm="3">Km recorridos: </Form.Label>
                           <Col sm="9">
-                          <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].distancia_total_viajada}`: "ERROR"}</Form.Label>
+                          <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].distancia_total_viajada}`: ""}</Form.Label>
                           </Col>
                         </Form.Group>
                         {showInfo.data.role === "Taxista"?                         <Form.Group as={Row}>
                           <Form.Label column sm="3">ID:  </Form.Label>
                           <Col sm="9">
-                          <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].numero_de_identificacion}`: "ERROR"}</Form.Label>
+                          <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].numero_de_identificacion}`: ""}</Form.Label>
                           </Col>
                         </Form.Group>:<></>}
                         <Form.Group as={Row} controlId="formPlaintextEmail">
                           <Form.Label column sm="3">Teléfono: </Form.Label>
                           <Col sm="9">
-                            <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].numero_de_celular}`: "ERROR"}</Form.Label>
+                            <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].numero_de_celular}`: ""}</Form.Label>
                           </Col>
                         </Form.Group>
                         <Form.Group as={Row} controlId="formPlaintextEmail">
                           <Form.Label column sm="3">Numero de viajes: </Form.Label>
                           <Col sm="9">
-                            <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].numero_de_viajes}`: "ERROR"}</Form.Label>
+                            <Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].numero_de_viajes}`: ""}</Form.Label>
                           </Col>
                         </Form.Group>
                         <Form.Group as={Row} controlId="formPlaintextEmail">
                           <Form.Label column sm="3">Deuda</Form.Label>
                           <Col sm="9">
-                            {showInfo.data.role === "User"?<Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].deuda}`: "ERROR"}</Form.Label>:<Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].saldo}`: "ERROR"}</Form.Label>}
+                            {showInfo.data.role === "User"?<Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].deuda}`: ""}</Form.Label>:<Form.Label column sm="3">{showInfo.data[0] ? `${showInfo.data[0].saldo}`: ""}</Form.Label>}
                           </Col>
                         </Form.Group>
                       </Col>
                       <Col md={3}>
 
                         <ButtonGroup vertical>
-                          <Button variant="secondary"><i className="fas fa-cog fa-4x"></i>
-                            Modificar</Button>
+                          {this.state.modif?<Button variant="secondary" onClick={(e) => this.setState({ modif:false })}><i className="fas fa-cog fa-4x"></i>
+                            Cancelar</Button>:<Button variant="secondary" onClick={(e) => this.setState({ modif:true })}><i className="fas fa-cog fa-4x"></i>
+                            Modificar</Button>}
                           <Button variant="warning">
                             <i className="fas fa-trash-alt fa-4x"></i>
                             Eliminar cuenta</Button>
@@ -97,7 +174,7 @@ class myInfo extends React.Component {
                           <br />
                           <br />
                           <Button variant="success" onClick={this.pagarDeuda}>
-                          <i class="fas fa-money-check-alt fa-3x"></i>
+                          <i className="fas fa-money-check-alt fa-3x"></i>
                             {showInfo.data.role === "User"? "Pagar":"Cobrar"}</Button>
                         </ButtonGroup>
 
@@ -109,6 +186,7 @@ class myInfo extends React.Component {
             </Form>
           </Modal.Body>
             <Modal.Footer>
+              {this.state.modif?<Button variant="info" onClick={this.saveChanges}>Guardar</Button>:<></>}
               <Button variant="secondary" onClick={this.handleClose}>
                 Salir</Button>
             </Modal.Footer>
@@ -124,7 +202,8 @@ class myInfo extends React.Component {
     });
     
     const mapDispatchToProps = {
-        showInfoAction
+        showInfoAction,
+        isAuthenticated
     };
 
 
