@@ -8,23 +8,39 @@ class Profile extends Component {
 
   constructor(props){
     super(props);
-    const {authenticated} = this.props;
-    if(!authenticated.loggedIn){
-      this.props.history.push('/');  
-    }
   }
 
-  render() {
-    const {authenticated} = this.props;  
-    return customProfile(authenticated.user)
+
+  componentWillReceiveProps(nextProps){
+    const {authenticated} = nextProps;
+    if(!authenticated.loggedIn){
+      return this.props.history.push('/');  
+    }    
   }
+
+  componentWillMount(){
+    const {authenticated} = this.props;
+    if(!authenticated.loggedIn){
+      return this.props.history.push('/');  
+    }  
+  }
+
+
+  render() {
+    const {authenticated} = this.props;
+      return customProfile(authenticated.user)
+    }
 }
 
 const customProfile = (role) => {
-  if(role.usuario){
-    return(<ProfileUser></ProfileUser>);
+  if(role){
+    if(role.usuario){
+      return(<ProfileUser></ProfileUser>);
+    }
+      return(<ProfileDriver></ProfileDriver>);
+  }else{
+    return <h3>NOTHING TO SHOW</h3>
   }
-    return(<ProfileDriver></ProfileDriver>);
 };
 
 const mapStateToProps = state => ({

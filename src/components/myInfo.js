@@ -9,8 +9,8 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import { connect } from 'react-redux'
 import showInfoAction from '../redux/actions/showInfoAction'
 import isAuthenticated from '../redux/actions/isAuthenticated'
+import isLogOut from '../redux/actions/isLogOut'
 import axios from 'axios'
-
 
 class myInfo extends React.Component {
 
@@ -20,18 +20,69 @@ class myInfo extends React.Component {
     this.handleClose = this.handleClose.bind(this);
     this.handlerChange = this.handlerChange.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
+    this.onChanged = this.onChanged.bind(this);
     this.state = {
       textNombre: '',
       textApellido: '',
-      modif: false  
+      modif: false,
+      numText: '',
+      passText: '',
+      showDelete: false  
     }
+  }
+
+
+  
+
+
+  onChanged(e,name){
+    const textR = e.target.value
+        switch(name){
+            case 'numCel':
+                return( 
+                    this.setState({
+                        numText: textR.replace(/[^0-9]/g, '')}))
+            case 'pass':
+                return(
+                    this.setState({
+                        passText: textR
+                    })
+                )                    
+        }
+
+  }
+
+  submitForm(e){
+    e.preventDefault();
+    const storage = JSON.parse(localStorage.getItem('userInfo'));
+    const r = window.confirm("¿Esta seguro que quiere eliminar la cuenta?");
+    if(r){
+      axios.delete('http://localhost:8080/profile/deleteUser',{data:{
+        num: this.state.numText,
+        pass: this.state.passText 
+      }, headers: {Authorization: storage.token}})
+      .then((res) => {
+        const {isLogOut} = this.props;
+        isLogOut();
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+    }else{
+      this.setState({
+        numText: '',
+        passText: '',
+        showDelete: false  
+      })
+      this.handleClose();  
+    } 
   }
 
   saveChanges(e){
     const {showInfo,isAuthenticated,showInfoAction} = this.props;
     const storage = JSON.parse(localStorage.getItem('userInfo'));
     e.preventDefault();
-    let r = window.confirm("¿Desea guardar los cambios?");  
+    const r = window.confirm("¿Desea guardar los cambios?");  
     if(r){
       axios.put('http://localhost:8080/profile/updateUser',{
         cel: showInfo.data[0].numero_de_celular,
@@ -69,7 +120,8 @@ class myInfo extends React.Component {
       this.setState({
         textNombre: '',
         textApellido: '',
-        modif: false  
+        modif: false,
+        showDelete:false  
       });
     }
 
@@ -103,6 +155,27 @@ class myInfo extends React.Component {
     const {showInfo} = this.props;  
     return (
         <>
+        <Modal size="sm" show={this.state.showDelete} onHide={(e) => this.setState({ showDelete:false, numText: '',passText: ''})} centered>
+          <Modal.Header closeButton>
+          <Modal.Title>Eliminar perfil</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <Form onSubmit={(e) => this.submitForm(e)}>
+              <Form.Group controlId="formID">
+              <Form.Label>Usuario</Form.Label>
+              <Form.Control placeholder="Digite su num celular..." onChange={event => this.onChanged(event,'numCel')} value={this.state.numText}/>
+              </Form.Group>
+
+              <Form.Group controlId="formBasicPassword">
+              <Form.Label>Contraseña</Form.Label>
+              <Form.Control type="password" placeholder="Digite la contraseña" onChange={event => this.onChanged(event,'pass')} value={this.state.passText}/>
+              </Form.Group>
+              <Button variant="warning" type="submit">
+                Eliminar
+              </Button>
+          </Form>
+          </Modal.Body>
+        </Modal>
         <Modal
           size="lg"
           show={this.props.showInfo.show}
@@ -165,7 +238,7 @@ class myInfo extends React.Component {
                           {this.state.modif?<Button variant="secondary" onClick={(e) => this.setState({ modif:false })}><i className="fas fa-cog fa-4x"></i>
                             Cancelar</Button>:<Button variant="secondary" onClick={(e) => this.setState({ modif:true })}><i className="fas fa-cog fa-4x"></i>
                             Modificar</Button>}
-                          <Button variant="warning">
+                          <Button variant="warning" onClick={(e) => {this.handleClose(); this.setState({showDelete:true})}}>
                             <i className="fas fa-trash-alt fa-4x"></i>
                             Eliminar cuenta</Button>
                           </ButtonGroup>
@@ -203,7 +276,8 @@ class myInfo extends React.Component {
     
     const mapDispatchToProps = {
         showInfoAction,
-        isAuthenticated
+        isAuthenticated,
+        isLogOut
     };
 
 

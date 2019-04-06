@@ -7,39 +7,33 @@ import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
+import PedirCarrera from './pedirCarrera'
+import initialStateViajes from '../redux/actions/initialStateViajes'
+
 
 class FormGetTaxi extends Component {
 
     //Propiedades
     constructor(props) {
         super(props);
-        this.state = {
-            pidio: false
-        };
-        this.pedirCarrera = this.pedirCarrera.bind(this);    
+        this.pedirCarrera = this.pedirCarrera.bind(this);   
     }
 
     pedirCarrera(){
-        const {dirDestino,dirOrigen,logged} = this.props;
+        const {dirDestino,dirOrigen,logged,initialStateViajes} = this.props;
         axios.post('http://localhost:8080/profile/pedirCarrera',{
             num: logged.user.usuario.num_cel_u,
             coordsI: `(${dirOrigen.ln},${dirOrigen.lat})`,
             coordsF:`(${dirDestino.ln},${dirDestino.lat})`
         }).then((res) => {
-            setTimeout(function(){
-                axios.post('http://localhost:8080/profile/confirmarCarrera',{
-                    num: logged.user.usuario.num_cel_u
-                }).then((res) => {
-                    console.log(res.data);
-                    this.setState({
-                        pidio:true
-                    });    
-                }).catch((err) => {
-                    console.log(err.response);    
-                })        
-            } ,5000);    
+            console.log(res);
+            alert(res.data.message);
+            initialStateViajes({
+                sePidio: true, seConfirmo: false, calificar:false    
+            });
         }).catch((err) => {
-            console.log(err);    
+            
+            alert(err.response);    
         });
     }
 
@@ -47,6 +41,7 @@ class FormGetTaxi extends Component {
         const {dirOrigen,dirDestino} = this.props;
         return (
             <Row>
+                <PedirCarrera></PedirCarrera>
                 <Col md={12}>
                     <Form className="text-left text-white">
                         <Form.Group>
@@ -64,7 +59,7 @@ class FormGetTaxi extends Component {
                             <Form.Label><i className="fas fa-location-arrow"></i> Hasta</Form.Label>
                             <Form.Control disabled={true} defaultValue={dirDestino.name} type="text" placeholder="Seleccione destino con marcador del mapa..." />
                         </Form.Group>
-                        {this.state.pidio?<></>:<Button className="btn btn-warning" onClick={this.pedirCarrera}>PEDIR AHORA</Button>}
+                        <Button className="btn btn-warning" onClick={this.pedirCarrera}>PEDIR AHORA</Button>
                     </Form>
                 </Col>
             </Row>
@@ -72,9 +67,15 @@ class FormGetTaxi extends Component {
     }
 }
 
+
+const mapDispatchToProps = {
+    initialStateViajes
+};
+
+
 const mapStateToProps = state => ({
     logged: state.authenticated 
 });
 
 
-export default connect(mapStateToProps)(FormGetTaxi);
+export default connect(mapStateToProps,mapDispatchToProps)(FormGetTaxi);

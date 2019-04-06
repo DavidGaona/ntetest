@@ -61,7 +61,7 @@ class Mapa extends Component {
     axios.post('http://localhost:8080/profile/dirfav',{
       cel: logged.user.usuario.num_cel_u,
       nombre: this.state.name,
-      coords: `(${this.state.lat},${this.state.lng})`
+      coords: `(${this.state.lng},${this.state.lat})`
     }).then(res => {
       alert("Dirección guardada con éxito")
     }).catch(err => {

@@ -48,7 +48,7 @@ class LoginForm extends React.Component {
     }
 
     onChanged(event,name) {
-        let textR = event.target.value
+        const textR = event.target.value
         switch(name){
             case 'numCel':
                 return( 

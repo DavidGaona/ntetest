@@ -112,7 +112,7 @@ class Direcciones extends Component {
                       </Carousel.Caption>
                     </Carousel.Item>)
                   );
-                  if(dirs.length != 0){
+                  if(dirs.length !== 0){
                     this.setState({
                       infoDirs: res.data,
                       direcciones: dirs 
