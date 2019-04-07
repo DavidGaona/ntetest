@@ -5,6 +5,9 @@ import Modal from 'react-bootstrap/Modal'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import initialStateViajes from '../redux/actions/initialStateViajes'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 
 class PedirCarrera extends React.Component {
 
@@ -13,6 +16,14 @@ class PedirCarrera extends React.Component {
     super(props, context);
     this.confirmar = this.confirmar.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.state = {
+      nombreCompleto:'',
+      numeroCelTaxista:'',
+      placa:'',
+      marcaModelo:'',
+      numeroDeViajes:'',
+      puntaje:''
+    };
   }
 
   handleClose(){
@@ -21,15 +32,26 @@ class PedirCarrera extends React.Component {
   }
 
   confirmar(){
-    const {logged} = this.props;
+    const {logged,initialStateViajes} = this.props;
     axios.post('http://localhost:8080/profile/confirmarCarrera',{
         num: logged.user.usuario.num_cel_u
     })
     .then((res) => {
-        console.log(res);
+        initialStateViajes({
+          sePidio: true, seConfirmo: true, calificar:false    
+        });
+        this.setState({
+          nombreCompleto:res.data.vistaDeTaxista.nombreCompleto,
+          numeroCelTaxista:res.data.vistaDeTaxista.numeroCelTaxista,
+          placa:res.data.vistaDeTaxista.placa,
+          marcaModelo:res.data.vistaDeTaxista.marcaModelo,
+          numeroDeViajes:res.data.vistaDeTaxista.numeroDeViajes,
+          puntaje:res.data.vistaDeTaxista.puntaje
+        })
+        clearInterval(this.interval);
     })
     .catch((err) => {
-        console.log(err.response);
+      console.log(err.response);
     })      
   }
 
@@ -55,8 +77,16 @@ class PedirCarrera extends React.Component {
                     });
                     break;
                 case 'carrera':
+                    this.setState({
+                      nombreCompleto:res.data.vistaDeTaxista.nombreCompleto,
+                      numeroCelTaxista:res.data.vistaDeTaxista.numeroCelTaxista,
+                      placa:res.data.vistaDeTaxista.placa,
+                      marcaModelo:res.data.vistaDeTaxista.marcaModelo,
+                      numeroDeViajes:res.data.vistaDeTaxista.numeroDeViajes,
+                      puntaje:res.data.vistaDeTaxista.puntaje
+                    });
                     initialStateViajes({
-                        sePidio: true, seConfirmo: true, calificar:false    
+                      sePidio: true, seConfirmo: true, calificar:false    
                     });
                     break;
                 default: 
@@ -64,18 +94,18 @@ class PedirCarrera extends React.Component {
             }
         })
         .catch((err) => {
-            
+
         });
   }
 
   componentWillReceiveProps(nextProps){
-    if(nextProps.sePidio){
+    if(nextProps.globalState.payload.sePidio && !(nextProps.globalState.payload.seConfirmo)){
         this.interval = setInterval(this.confirmar,3000);
     }       
   }
 
   componentDidMount(){
-    if(this.props.sePidio){
+    if(this.props.globalState.payload.sePidio && !(this.props.globalState.payload.seConfirmo)){
         this.interval = setInterval(this.confirmar,3000);
     }    
   }
@@ -97,10 +127,35 @@ class PedirCarrera extends React.Component {
           backdrop="static"
         >
           <Modal.Header closeButton={false}>
-            <Modal.Title>Pedir carrera</Modal.Title>
+            <Modal.Title>{globalState.payload.seConfirmo?"Carrera en curso":"Pedir Carrera"}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-          <h3>ESPERANDO CONFIRMACIÓN DEL TAXISTA....</h3>
+          {globalState.payload.seConfirmo?<Container>
+                                                                                          <Row>
+                                                                                            <Col sm>Nombre completo: </Col>
+                                                                                            <Col sm>{this.state.nombreCompleto}</Col>
+                                                                                          </Row>
+                                                                                          <Row>
+                                                                                            <Col sm>Numero Cel Taxista: </Col>
+                                                                                            <Col sm>{this.state.numeroCelTaxista}</Col>
+                                                                                          </Row>
+                                                                                          <Row>
+                                                                                            <Col sm>Placa: </Col>
+                                                                                            <Col sm>{this.state.placa}</Col>
+                                                                                          </Row>
+                                                                                          <Row>
+                                                                                            <Col sm>Marca modelo: </Col>
+                                                                                            <Col sm>{this.state.marcaModelo}</Col>
+                                                                                          </Row>
+                                                                                          <Row>
+                                                                                            <Col sm>Numero de viajes realizados</Col>
+                                                                                            <Col sm>{this.state.numeroDeViajes}</Col>
+                                                                                          </Row>
+                                                                                          <Row>
+                                                                                            <Col sm>puntaje</Col>
+                                                                                            <Col sm>{this.state.puntaje}</Col>
+                                                                                          </Row>
+                                                                                        </Container>:<h3>ESPERANDO CONFIRMACIÓN DEL TAXISTA....</h3>}
           <div className="spinner">
             <div></div>
             <div></div>

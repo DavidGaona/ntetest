@@ -26,14 +26,13 @@ class FormGetTaxi extends Component {
             coordsI: `(${dirOrigen.ln},${dirOrigen.lat})`,
             coordsF:`(${dirDestino.ln},${dirDestino.lat})`
         }).then((res) => {
-            console.log(res);
+            console.log(res.data);
             alert(res.data.message);
             initialStateViajes({
                 sePidio: true, seConfirmo: false, calificar:false    
             });
         }).catch((err) => {
-            
-            alert(err.response);    
+            alert(err.response.data.message);
         });
     }
 
