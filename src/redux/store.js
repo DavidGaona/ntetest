@@ -6,6 +6,7 @@ import showDirection from './reducers/showDirection'
 import desdeDir from './reducers/desdeDir'
 import hastaDir from './reducers/hastaDir'
 import initialStateViajes from './reducers/initialStateViajes'
+import activarCarInfo from './reducers/activarCarInfo'
 
 const reducer = combineReducers({
     activarLogin,
@@ -14,7 +15,8 @@ const reducer = combineReducers({
     showDirection,
     desdeDir,
     hastaDir,
-    initialStateViajes
+    initialStateViajes,
+    activarCarInfo
 });
 
 const store = createStore(reducer);

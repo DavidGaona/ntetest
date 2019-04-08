@@ -8,6 +8,7 @@ import initialStateViajes from '../redux/actions/initialStateViajes'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import Calificacion from './calificacion'
 
 class PedirCarrera extends React.Component {
 
@@ -16,6 +17,7 @@ class PedirCarrera extends React.Component {
     super(props, context);
     this.confirmar = this.confirmar.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.terminar = this.terminar.bind(this);
     this.state = {
       nombreCompleto:'',
       numeroCelTaxista:'',
@@ -28,7 +30,24 @@ class PedirCarrera extends React.Component {
 
   handleClose(){
     const {initialStateViajes} = this.props;
-        initialStateViajes({sePidio: true, seConfirmo: false, calificar:false});
+        initialStateViajes({sePidio: false, seConfirmo: false, calificar:false});
+  }
+
+  terminar(){
+    const {logged,initialStateViajes} = this.props;
+    axios.post('http://localhost:8080/profile/notificarCarreraTerminada',{
+      num: logged.user.usuario.num_cel_u 
+    })
+    .then((res) => {
+      alert(`${res.data.message} \n Costo: ${res.data.costo}`);
+      initialStateViajes({
+        sePidio: false, seConfirmo: false, calificar:true    
+      });
+      clearInterval(this.interval);  
+    })
+    .catch((err) => {
+      console.log(err.data);
+    });   
   }
 
   confirmar(){
@@ -101,12 +120,18 @@ class PedirCarrera extends React.Component {
   componentWillReceiveProps(nextProps){
     if(nextProps.globalState.payload.sePidio && !(nextProps.globalState.payload.seConfirmo)){
         this.interval = setInterval(this.confirmar,3000);
+    }
+    if(nextProps.globalState.payload.seConfirmo && !(nextProps.globalState.payload.calificar)){
+      this.interval = setInterval(this.terminar,3000);
     }       
   }
 
   componentDidMount(){
     if(this.props.globalState.payload.sePidio && !(this.props.globalState.payload.seConfirmo)){
         this.interval = setInterval(this.confirmar,3000);
+    }
+    if(this.props.globalState.payload.seConfirmo && !(this.props.globalState.payload.calificar)){
+      this.interval = setInterval(this.terminar,3000);
     }    
   }
 
@@ -116,10 +141,10 @@ class PedirCarrera extends React.Component {
   }
 
   render() {
-    const {globalState} = this.props;
-    console.log(globalState);
+    const {globalState,logged} = this.props;
     return (
         <>
+        
         <Modal
           size="lg"
           show={globalState.payload.sePidio}
@@ -127,8 +152,9 @@ class PedirCarrera extends React.Component {
           backdrop="static"
         >
           <Modal.Header closeButton={false}>
-            <Modal.Title>{globalState.payload.seConfirmo?"Carrera en curso":"Pedir Carrera"}</Modal.Title>
+            <Modal.Title>{globalState.payload.calificar?"Carrera Terminada: Por favor califique el servicio prestado por el taxista":globalState.payload.seConfirmo?"Carrera en curso":"Pedir Carrera"}</Modal.Title>
           </Modal.Header>
+          {globalState.payload.calificar?<Modal.Body><Calificacion numCel={logged.user.usuario.num_cel_u} handleClose={this.handleClose}></Calificacion></Modal.Body>:
           <Modal.Body>
           {globalState.payload.seConfirmo?<Container>
                                                                                           <Row>
@@ -161,7 +187,7 @@ class PedirCarrera extends React.Component {
             <div></div>
             <div></div>
           </div>
-          </Modal.Body>
+          </Modal.Body>}
             <Modal.Footer>
               <Button variant="secondary">
                 Terminar</Button>

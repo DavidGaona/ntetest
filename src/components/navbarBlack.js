@@ -17,6 +17,7 @@ import loginForm from '../redux/actions/loginForm'
 import isLogOut from '../redux/actions/isLogOut'
 import showDirectionsAction from '../redux/actions/showDirectionsAction'
 import showInfoAction from '../redux/actions/showInfoAction'
+import showCarInfo from '../redux/actions/showCarInfo'
 import Form from 'react-bootstrap/Form'
 import { withRouter } from 'react-router-dom'
 
@@ -30,8 +31,13 @@ class NavbarBlack extends Component {
         this.showInfo = this.showInfo.bind(this);
         this.showDirForm = this.showDirForm.bind(this);
         this.searchDir = this.searchDir.bind(this);
+        this.showcarInfo = this.showcarInfo.bind(this);
     }
 
+    showcarInfo(){
+        const {showCarInfo} = this.props;
+        showCarInfo(true);
+    }
 
     searchDir(lat,ln){
         
@@ -140,7 +146,7 @@ class NavbarBlack extends Component {
                 <Brand href="/">NoThatEasyTaxi</Brand>
                 {logged.loggedIn ? <Nav className="mr-auto">
                 <DropdownButton drop={'down'} variant="warning" title={logged.user.usuario?`${logged.user.usuario.nombre} ${logged.user.usuario.apellido}`:`${logged.user.taxista.nombre} ${logged.user.taxista.apellido}`} id="desplegable" key="down">
-                <DropdownItem eventKey="1" onClick={this.showInfo} active={false}>Perfil</DropdownItem>{logged.user.usuario? <DropdownItem eventKey="2" onClick={this.showDirForm} active={false}>Modificar/Eliminar Direcciones Favoritas</DropdownItem>:<></>}</DropdownButton>
+                <DropdownItem eventKey="1" onClick={this.showInfo} active={false}>Perfil</DropdownItem>{logged.user.usuario? <DropdownItem eventKey="2" onClick={this.showDirForm} active={false}>Modificar/Eliminar Direcciones Favoritas</DropdownItem>:<DropdownItem eventKey="3" onClick={this.showcarInfo} active={false}>Agregar Vehículo</DropdownItem>}</DropdownButton>
                 </Nav>: <Nav className="mr-auto">
                     <Link href="/#services">Servicios</Link>
                     <Link href="/#registro">Registro</Link>
@@ -170,7 +176,8 @@ const mapDispatchToProps = {
     isLogOut,
     loginForm,
     showInfoAction,
-    showDirectionsAction
+    showDirectionsAction,
+    showCarInfo
 };
 
 
