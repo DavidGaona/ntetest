@@ -39,14 +39,14 @@ class PedirCarrera extends React.Component {
       num: logged.user.usuario.num_cel_u 
     })
     .then((res) => {
+      clearInterval(this.interval);
       alert(`${res.data.message} \n Costo: ${res.data.costo}`);
       initialStateViajes({
         sePidio: false, seConfirmo: false, calificar:true    
-      });
-      clearInterval(this.interval);  
+      });  
     })
     .catch((err) => {
-      console.log(err.data);
+      console.log(err.response);
     });   
   }
 
@@ -56,6 +56,7 @@ class PedirCarrera extends React.Component {
         num: logged.user.usuario.num_cel_u
     })
     .then((res) => {
+        clearInterval(this.interval);
         initialStateViajes({
           sePidio: true, seConfirmo: true, calificar:false    
         });
@@ -67,7 +68,6 @@ class PedirCarrera extends React.Component {
           numeroDeViajes:res.data.vistaDeTaxista.numeroDeViajes,
           puntaje:res.data.vistaDeTaxista.puntaje
         })
-        clearInterval(this.interval);
     })
     .catch((err) => {
       console.log(err.response);
@@ -113,11 +113,12 @@ class PedirCarrera extends React.Component {
             }
         })
         .catch((err) => {
-
+            initialStateViajes({});
         });
   }
 
   componentWillReceiveProps(nextProps){
+    console.log(nextProps.globalState);
     if(nextProps.globalState.payload.sePidio && !(nextProps.globalState.payload.seConfirmo)){
         this.interval = setInterval(this.confirmar,3000);
     }
@@ -125,16 +126,6 @@ class PedirCarrera extends React.Component {
       this.interval = setInterval(this.terminar,3000);
     }       
   }
-
-  componentDidMount(){
-    if(this.props.globalState.payload.sePidio && !(this.props.globalState.payload.seConfirmo)){
-        this.interval = setInterval(this.confirmar,3000);
-    }
-    if(this.props.globalState.payload.seConfirmo && !(this.props.globalState.payload.calificar)){
-      this.interval = setInterval(this.terminar,3000);
-    }    
-  }
-
 
   componentWillUnmount() {
     clearInterval(this.interval);
@@ -189,8 +180,6 @@ class PedirCarrera extends React.Component {
           </div>
           </Modal.Body>}
             <Modal.Footer>
-              <Button variant="secondary">
-                Terminar</Button>
             </Modal.Footer>
         </Modal>
       </>

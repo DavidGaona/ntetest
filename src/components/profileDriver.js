@@ -5,9 +5,9 @@ import Container from 'react-bootstrap/Container'
 import MyInfo from './myInfo'
 import CarInfo from './carInfo'
 import { connect } from 'react-redux'
-import Button from 'react-bootstrap/Button';
-import axios from 'axios';
-
+import Button from 'react-bootstrap/Button'
+import axios from 'axios'
+import Carrera from './carrera'
 
 class profileDriver extends Component {
 
@@ -18,38 +18,106 @@ class profileDriver extends Component {
             estado: "ACTIVAR",
             color: "boton-redondo",
             enServicio: false,
-            enCarrera: false
+            enCarrera: false,
+            onConfirm: false,
+            userInfo: undefined
         }
         this.activarTaxi = this.activarTaxi.bind(this);
         this.service = this.service.bind(this);
         this.start = this.start.bind(this);
-        this.comenzarCarrera = this.comenzarCarrera.bind(this);
+        this.buscarCarrera = this.buscarCarrera.bind(this);
+        this.confirmarCarrera = this.confirmarCarrera.bind(this);
+        this.terminarCarrera = this.terminarCarrera.bind(this);
+        this.promiseTerminarCarrera = this.promiseTerminarCarrera.bind(this);
     }
 
 
-    comenzarCarrera(){
+
+    terminarCarrera(){
+        navigator.geolocation.getCurrentPosition(this.promiseTerminarCarrera);
+    }
+
+    promiseTerminarCarrera(callbackArg){
         const {logged} = this.props;
-        axios.post('http://localhost:8080/taxista/confirmar',{
+        axios.post('http://localhost:8080/taxista/terminarCarrera',{
+            id_taxista: logged.user.taxista.idTaxista,
+            coordsF:`(${callbackArg.coords.longitude},${callbackArg.coords.latitude})`
+        })
+        .then((res) => {
+            alert(`${res.data.message} \n \n Ganancia de la carrera: ${res.data.costo}`);
+            this.setState({
+                enCarrera: false,
+                onConfirm: false,
+                userInfo: {}
+            })
+        })
+        .catch((err) => {
+            
+            this.setState({
+                enCarrera: false,
+                onConfirm: false,
+                userInfo: {}
+            })
+        })   
+    }
+
+    confirmarCarrera(){
+        const {logged} = this.props;
+        axios.post('http://localhost:8080/taxista/confirmarServicio',{
             id_taxista: logged.user.taxista.idTaxista    
         })
         .then((res) => {
-            console.log(res.data);
+            alert("La carrera ha comenzado");
+            this.setState({
+                onConfirm: true,
+                enCarrera:true
+            })
         })
         .catch((err) => {
-            console.log(err.response);
+            let message = err.response.data.message;
+            message? alert(message): alert("Fatal error: 505 internal server error")
         });        
     }
 
-    componentWillUpdate(){
-        if(this.state.enServicio){
+    buscarCarrera(){
+        const {logged} = this.props;
+        const storage = JSON.parse(localStorage.getItem('userInfo'));
+        axios.post('http://localhost:8080/taxista/buscarServicio',{
+            id_taxista: logged.user.taxista.idTaxista
+        },{
+            headers: {
+                    Authorization: storage.token
+        }})
+        .then((res) => {
+            clearInterval(this.interval);
+            this.setState({
+                onConfirm: true,
+                userInfo: res.data.vistaDeUsuario
+            }); 
+        })
+        .catch((err) => {  
+            console.log(err.response);
+        });
+    }
+
+    componentDidUpdate(){
+        if(this.state.enServicio && !(this.state.enCarrera) && !(this.state.onConfirm)){
             this.interval = setInterval(this.buscarCarrera,3000);    
-        }    
+        }
     }
 
 
+    componentDidMount(){
+        if(this.state.enServicio && !(this.state.enCarrera) && !(this.state.onConfirm)){
+            this.interval = setInterval(this.buscarCarrera,3000);    
+        }
+    }
 
-    //ToDo
-    /*componentWillMount(){ 
+    componentWillUnmount(){
+        clearInterval(this.interval);
+    }
+    
+    componentWillMount(){ 
         const {logged} = this.props;
         const storage = JSON.parse(localStorage.getItem('userInfo'));
         axios.get(`http://localhost:8080/taxista/revisarEstadoTaxista/${logged.user.taxista.idTaxista}`,{
@@ -59,37 +127,45 @@ class profileDriver extends Component {
           .then((res) => {
               const estado = res.data.estado;
               switch(estado){
-                  case 'calificando':
-                      initialStateViajes({
-                          sePidio: true, seConfirmo: true, calificar: true    
-                      });
-                      break;
-                  case 'solicitando':
-                      initialStateViajes({
-                          sePidio: true, seConfirmo: false, calificar:false    
+                  case 'buscando':
+                      this.setState({
+                          enCarrera: false,
+                          onConfirm: false,
+                          enServicio: true,
+                          estado: "DESACTIVAR",
+                          color: "boton-redondo-gris"
                       });
                       break;
                   case 'carrera':
                       this.setState({
-                        nombreCompleto:res.data.vistaDeTaxista.nombreCompleto,
-                        numeroCelTaxista:res.data.vistaDeTaxista.numeroCelTaxista,
-                        placa:res.data.vistaDeTaxista.placa,
-                        marcaModelo:res.data.vistaDeTaxista.marcaModelo,
-                        numeroDeViajes:res.data.vistaDeTaxista.numeroDeViajes,
-                        puntaje:res.data.vistaDeTaxista.puntaje
-                      });
-                      initialStateViajes({
-                        sePidio: true, seConfirmo: true, calificar:false    
-                      });
+                          userInfo: res.data.vistaDeUsuario,
+                          enCarrera: true,
+                          onConfirm:true,
+                          enServicio: true,
+                          estado: "DESACTIVAR",
+                          color: "boton-redondo-gris"
+                      })
                       break;
-                  default: 
-                      initialStateViajes({});
+                  default:
+                      this.setStat({
+                          enCarrera:false,
+                          enServicio:false,
+                          onConfirm: false,
+                          estado: "ACTIVAR",
+                          color: "boton-redondo"
+                      })
               }
           })
           .catch((err) => {
-  
+             this.setState({
+                enCarrera:false,
+                enServicio:false,
+                onConfirm: false,
+                estado: "ACTIVAR",
+                color: "boton-redondo"
+             })
           });
-    }*/
+    }
 
     start(callbackArg){
         const {logged} = this.props;
@@ -119,10 +195,11 @@ class profileDriver extends Component {
             });    
         }else{
             const {logged} = this.props; 
-            axios.post('http://localhost:8080/taxista/comenzarServicio',{
-                id_taxista:logged.user.taxista.idTaxista,
+            axios.put('http://localhost:8080/taxista/terminarServicio',{
+                id_taxista:logged.user.taxista.idTaxista
             })
             .then((res) => {
+                clearInterval(this.interval);
                 alert(res.data.message);
                 this.setState({
                     enServicio: true,
@@ -131,6 +208,7 @@ class profileDriver extends Component {
                 });
             })
             .catch((err) => {
+                clearInterval(this.interval);
                 alert(err.response.message);
                 this.setState({
                     enServicio: true,
@@ -155,6 +233,7 @@ class profileDriver extends Component {
                 <Container className="App-padding-top">
                     <MyInfo></MyInfo>
                     <CarInfo></CarInfo>
+                    <Carrera userInfo={this.state.userInfo} onConfirm={this.state.onConfirm} enCarrera={this.state.enCarrera} confirmarCarrera={this.confirmarCarrera} terminarCarrera={this.terminarCarrera}></Carrera>
                     <div className="App-header-mainTaxi">
                         <Button id="btn-servicio"
                             className={this.state.color}

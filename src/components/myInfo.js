@@ -21,6 +21,7 @@ class myInfo extends React.Component {
     this.handlerChange = this.handlerChange.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
     this.onChanged = this.onChanged.bind(this);
+    this.pagar = this.pagar.bind(this);
     this.state = {
       textNombre: '',
       textApellido: '',
@@ -32,7 +33,38 @@ class myInfo extends React.Component {
   }
 
 
-  
+  pagar(){
+    const {showInfo} = this.props;
+    const storage = JSON.parse(localStorage.getItem('userInfo'));
+    if(storage.usuario){
+      axios.put('http://localhost:8080/profile/updateUser',{
+        num: showInfo.data[0].numero_de_celular
+      },
+      {headers: {Authorization: storage.token}
+      })
+      .then((res) => {
+        alert(res.data.message);
+        this.handleClose();
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+      });
+    }else{
+      axios.put('http://localhost:8080/taxista/cobrar',{
+        id_taxista: showInfo.data[0].numero_de_identificacion
+      },
+      {headers: {Authorization: storage.token}
+      })
+      .then((res) => {
+        alert(res.data.message);
+        this.handleClose();
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+      });
+    }
+
+  }
 
 
   onChanged(e,name){
@@ -238,15 +270,15 @@ class myInfo extends React.Component {
                           {this.state.modif?<Button variant="secondary" onClick={(e) => this.setState({ modif:false })}><i className="fas fa-cog fa-4x"></i>
                             Cancelar</Button>:<Button variant="secondary" onClick={(e) => this.setState({ modif:true })}><i className="fas fa-cog fa-4x"></i>
                             Modificar</Button>}
-                          <Button variant="warning" onClick={(e) => {this.handleClose(); this.setState({showDelete:true})}}>
+                            {showInfo.data.role === "User"?<Button variant="warning" onClick={(e) => {this.handleClose(); this.setState({showDelete:true})}}>
                             <i className="fas fa-trash-alt fa-4x"></i>
-                            Eliminar cuenta</Button>
+                            Eliminar cuenta</Button>:<></>}
                           </ButtonGroup>
                           <ButtonGroup vertical>
                           <br />
                           <br />
                           <br />
-                          <Button variant="success" onClick={this.pagarDeuda}>
+                          <Button variant="success" onClick={this.pagar}>
                           <i className="fas fa-money-check-alt fa-3x"></i>
                             {showInfo.data.role === "User"? "Pagar":"Cobrar"}</Button>
                         </ButtonGroup>

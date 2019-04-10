@@ -29,33 +29,58 @@ class carreraEncontrada extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            show: false,
             lat: 0,
             lng: 0,
             zoom: 13,
+            user: {}
         }
-        this.handleShow = this.handleShow.bind(this);
         this.handleClose = this.handleClose.bind(this);
     }
 
-    handleClose() {
-        this.setState({ show: false });
+    handleClose(){    
     }
 
-    handleShow() {
-        this.setState({ show: true });
+    componentWillUnmount(){
+        this.setState({
+            lat: 0,
+            lng: 0
+        });
+    }
+
+    componentWillMount(){
+        const {userInfo} = this.props
+        
+        if(userInfo){
+            this.setState({
+                lat: userInfo.ubicacionLat,
+                lng: userInfo.ubicacionLong,
+                user: userInfo
+            });
+        } 
+    }
+
+    componentWillReceiveProps(nextProps){
+        const {userInfo} = nextProps
+        if(userInfo){
+            this.setState({
+                lat: userInfo.ubicacionLat,
+                lng: userInfo.ubicacionLong,
+                user: userInfo
+            });
+        }
     }
 
     render() {
-        const position = [this.state.lat, this.state.lng];
+        const position = [this.state.lat, this.state.lng];  
         return (
             <>
             <Modal
-                show={this.state.show}
+                show={this.props.onConfirm}
                 onHide={this.handleClose}
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
+                backdrop="static"
             >
                 <Modal.Header>
                     <Modal.Title id="contained-modal-title-vcenter">
@@ -63,21 +88,21 @@ class carreraEncontrada extends Component {
                 </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <h4>Carrera encontrada</h4>
+                    {this.props.enCarrera?<h4>Carrera en curso...</h4>:<h4>Buscando carrera...</h4>}
                     <Form.Group as={Row} controlId="formOrigen">
-                        <Form.Label column sm="2">
-                            Origen
+                    <Form.Label column sm="2">
+                        {this.state.user.nombreCompleto}        
                     </Form.Label>
                         <Col sm="10">
                             <Form.Label column sm="10">
-                                direccion origen
+                                {this.state.user.numeroCelUsuario}
                         </Form.Label>
                         </Col>
                     </Form.Group>
 
                     <Form.Group as={Row} controlId="formDestino">
                         <Form.Label column sm="2">
-                            Destino
+                            {this.state.user.numeroDeViajes}
                     </Form.Label>
                         <Col sm="10">
                             <Form.Label column sm="10">
@@ -87,7 +112,7 @@ class carreraEncontrada extends Component {
                     </Form.Group>
 
                     <Container className="map-container">
-                        <LeafletMap ref={(ref) => this.map = ref} onclick={this.changePosition} style={{ height: "350px", width: "auto" }} center={position} zoom={this.state.zoom}>
+                        {this.props.onConfirm?<LeafletMap ref={(ref) => this.map = ref} style={{ height: "350px", width: "auto" }} center={position} zoom={this.state.zoom}>
                             <TileLayer
                                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                 url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
@@ -95,12 +120,12 @@ class carreraEncontrada extends Component {
 
                             <Marker position={position}>
                             </Marker>
-                        </LeafletMap>
+                        </LeafletMap>:<></>}
                     </Container>
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={this.handleClose}>Close</Button>
+                    {this.props.enCarrera?<Button onClick={this.props.terminarCarrera}>Terminar Carrera</Button>:<Button onClick={this.props.confirmarCarrera}>Confirmar Carrera</Button>}
                 </Modal.Footer>
             </Modal>
             </>
