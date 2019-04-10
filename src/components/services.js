@@ -20,7 +20,7 @@ class Servicios extends Component {
                 <Container>
                     <Row>
                         <Col md={12}>
-                            <h2 className="text-center">SERVICIOS</h2>
+                            <h2 className="text-center">VENTAJAS</h2>
                         </Col>
                     </Row>
 

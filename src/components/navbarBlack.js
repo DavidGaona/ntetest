@@ -148,7 +148,7 @@ class NavbarBlack extends Component {
                 <DropdownButton drop={'down'} variant="warning" title={logged.user.usuario?`${logged.user.usuario.nombre} ${logged.user.usuario.apellido}`:`${logged.user.taxista.nombre} ${logged.user.taxista.apellido}`} id="desplegable" key="down">
                 <DropdownItem eventKey="1" onClick={this.showInfo} active={false}>Perfil</DropdownItem>{logged.user.usuario? <DropdownItem eventKey="2" onClick={this.showDirForm} active={false}>Modificar/Eliminar Direcciones Favoritas</DropdownItem>:<DropdownItem eventKey="3" onClick={this.showcarInfo} active={false}>Agregar Vehículo</DropdownItem>}</DropdownButton>
                 </Nav>: <Nav className="mr-auto">
-                    <Link href="/#services">Servicios</Link>
+                    <Link href="/#services">Ventajas</Link>
                     <Link href="/#registro">Registro</Link>
                     </Nav>}
                 {logged.loggedIn ? 

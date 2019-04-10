@@ -6,7 +6,6 @@ import Form from 'react-bootstrap/Form'
 import { Map as LeafletMap, TileLayer, Marker, Popup } from 'react-leaflet'
 import "leaflet/dist/leaflet.css";
 import L from 'leaflet';
-import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal'
@@ -106,13 +105,13 @@ class carreraEncontrada extends Component {
                     </Form.Label>
                         <Col sm="10">
                             <Form.Label column sm="10">
-                                direccion destino
+                                Numero de viajes
                         </Form.Label>
                         </Col>
                     </Form.Group>
 
                     <Container className="map-container">
-                        {this.props.onConfirm?<LeafletMap ref={(ref) => this.map = ref} style={{ height: "350px", width: "auto" }} center={position} zoom={this.state.zoom}>
+                        {this.props.onConfirm?<LeafletMap ref={(ref) => this.map = ref} style={{ height: "230px", width: "auto" }} center={position} zoom={this.state.zoom}>
                             <TileLayer
                                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                 url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
