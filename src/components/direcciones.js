@@ -26,7 +26,15 @@ class Direcciones extends Component {
         this.getDir = this.getDir.bind(this);
         this.ponerDesde = this.ponerDesde.bind(this);
         this.ponerHasta = this.ponerHasta.bind(this);
-        this.getDir();
+        
+    }
+
+    componentWillMount(){
+      this.getDir();
+    }
+
+    componentWillUpdate(){
+      this.getDir();
     }
 
     ponerDesde(e){

@@ -42,7 +42,7 @@ class PedirCarrera extends React.Component {
       clearInterval(this.interval);
       alert(`${res.data.message} \n Costo: ${res.data.costo}`);
       initialStateViajes({
-        sePidio: false, seConfirmo: false, calificar:true    
+        sePidio: true, seConfirmo: true, calificar:true    
       });  
     })
     .catch((err) => {

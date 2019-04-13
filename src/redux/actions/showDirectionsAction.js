@@ -1,7 +1,7 @@
 export const type = 'showDirectionsAction';
 
 
-const showDirectionsAction = (flag,res) => {
+const showDirectionsAction = (flag,res,toDelete) => {
     
     if(flag){
         return( 
@@ -9,7 +9,8 @@ const showDirectionsAction = (flag,res) => {
             type,
             payload: {
                 flag,
-                res
+                res,
+                toDelete
                      }
         }); 
     }else{
@@ -17,7 +18,8 @@ const showDirectionsAction = (flag,res) => {
             type,
             payload: {
                 flag,
-                res: {}    
+                res: {},
+                toDelete: []    
             }    
         }    
     }

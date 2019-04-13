@@ -32,6 +32,21 @@ class NavbarBlack extends Component {
         this.showDirForm = this.showDirForm.bind(this);
         this.searchDir = this.searchDir.bind(this);
         this.showcarInfo = this.showcarInfo.bind(this);
+        this.handler = this.handler.bind(this);
+    }
+
+    handler(e){
+        const {dirsInfo} = this.props;
+        if(e.target.checked){
+            dirsInfo.toDelete.push(e.target.name);
+        }else{
+            let index = dirsInfo.toDelete.findIndex((element) => {
+                return element === e.target.name
+            });
+            if(index !== -1){
+                dirsInfo.toDelete.splice(index,1);
+            }    
+        }
     }
 
     showcarInfo(){
@@ -39,8 +54,7 @@ class NavbarBlack extends Component {
         showCarInfo(true);
     }
 
-    searchDir(lat,ln){
-        
+    searchDir(ln,lat){
         return axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${ln}`, {
         }).then((res) => {
           return res.data.display_name; 
@@ -61,28 +75,25 @@ class NavbarBlack extends Component {
         }).then((res) => {
                  dirs = res.data.map(async (value,index) => {
                     const name = await this.searchDir(value.coords_gps_u.x,value.coords_gps_u.y);
-                    console.log(name);
                     return(<tr key={index}>
                     <td>
-                      {['checkbox'].map(type => (
-                        <div key={`custom-inline-${type}`} className="mb-3">
                           <Form.Check
                             custom
                             inline
                             label=""
-                            type={type}
-                            id={`custom-inline-${type}-1`}
+                            type={'checkbox'}
+                            id={`custom-checkbox_${index}`}
+                            name={value.nombre_dir}
+                            onClick={(e) => this.handler(e)}
                           />
-                        </div>
-                      ))}
                     </td>
                     <td>{value.nombre_dir}</td>
                     <td>{name}</td>
                     </tr>)                  
                  });
-                    showDirectionsAction(true, dirs); 
+                    showDirectionsAction(true, dirs,[]); 
                 }).catch((err) => {
-                    return showDirectionsAction(true,[]);
+                    return showDirectionsAction(true,[],[]);
                 });
 
     }
@@ -169,7 +180,8 @@ class NavbarBlack extends Component {
 const mapStateToProps = state => ({
     ...state,
     logged: state.authenticated,
-    showlog: state.activarLogin
+    showlog: state.activarLogin,
+    dirsInfo: state.showDirection
 });
 
 const mapDispatchToProps = {
