@@ -116,7 +116,8 @@ class myInfo extends React.Component {
     e.preventDefault();
     const r = window.confirm("¿Desea guardar los cambios?");  
     if(r){
-      axios.put('http://localhost:8080/profile/updateUser',{
+      if(!storage.taxista){
+        axios.put('http://localhost:8080/profile/updateUser',{
         cel: showInfo.data[0].numero_de_celular,
         nombre: this.state.textNombre,
         apellido: this.state.textApellido
@@ -148,6 +149,31 @@ class myInfo extends React.Component {
       .catch((err) => {
         console.log(err.response.data);  
       })
+      }else{
+        axios.put('http://localhost:8080/taxista/updateTaxista',{data:{
+          id_taxista: storage.taxista.idTaxista,
+          nombre: this.state.textNombre,
+          apellido: this.state.textApellido 
+        }, headers: {Authorization: storage.token}})
+        .then((res) => {
+          window.alert("Usuario actualizado con éxito");
+          const taxista = {
+          idTaxista: storage.taxista.idTaxista,  
+          numeroCelular: showInfo.data[0].numero_de_celular,
+          nombre: this.state.textNombre,
+          apellido: this.state.textApellido,
+          role: storage.taxista.role
+          }
+          isAuthenticated({
+            ok: true,
+            token: storage.token,
+            taxista   
+          });
+        })
+        .catch((err) => {
+          console.log(err.response.data);
+        })
+      }  
     }else{
       this.setState({
         textNombre: '',
@@ -155,8 +181,7 @@ class myInfo extends React.Component {
         modif: false,
         showDelete:false  
       });
-    }
-
+    }  
   }
 
   handlerChange(e){

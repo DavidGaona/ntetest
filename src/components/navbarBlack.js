@@ -151,6 +151,7 @@ class NavbarBlack extends Component {
 
     render() {
         const {logged} = this.props;
+        console.log(logged);
         return (
             <Navbar className= "App-NavbarBlack" fixed="top" variant="dark">
             <Container>

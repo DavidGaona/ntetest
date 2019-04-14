@@ -33,13 +33,9 @@ class Direcciones extends Component {
       this.getDir();
     }
 
-    componentWillUpdate(){
-      this.getDir();
-    }
-
     ponerDesde(e){
       const {updateDesde} = this.props;
-      const {lat,lng} = {lat: this.state.infoDirs[e.target.id].coords_gps_u.x,lng: this.state.infoDirs[e.target.id].coords_gps_u.y};
+      const {lat,lng} = {lng: this.state.infoDirs[e.target.id].coords_gps_u.x,lat: this.state.infoDirs[e.target.id].coords_gps_u.y};
         axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
         }).then((res) => {
           updateDesde({
@@ -54,7 +50,7 @@ class Direcciones extends Component {
 
     ponerHasta(e){
       const {updateHasta} = this.props;
-      const {lat,lng} = {lat: this.state.infoDirs[e.target.id].coords_gps_u.x,lng: this.state.infoDirs[e.target.id].coords_gps_u.y};
+      const {lat,lng} = {lng: this.state.infoDirs[e.target.id].coords_gps_u.x,lat: this.state.infoDirs[e.target.id].coords_gps_u.y};
         axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
         }).then((res) => {
           updateHasta({

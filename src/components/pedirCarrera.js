@@ -118,7 +118,7 @@ class PedirCarrera extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    console.log(nextProps.globalState);
+    
     if(nextProps.globalState.payload.sePidio && !(nextProps.globalState.payload.seConfirmo)){
         this.interval = setInterval(this.confirmar,3000);
     }

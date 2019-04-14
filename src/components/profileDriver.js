@@ -52,7 +52,6 @@ class profileDriver extends Component {
             })
         })
         .catch((err) => {
-            
             this.setState({
                 enCarrera: false,
                 onConfirm: false,
@@ -147,7 +146,7 @@ class profileDriver extends Component {
                       })
                       break;
                   default:
-                      this.setStat({
+                      this.setState({
                           enCarrera:false,
                           enServicio:false,
                           onConfirm: false,

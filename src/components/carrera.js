@@ -111,7 +111,7 @@ class carreraEncontrada extends Component {
                     </Form.Group>
 
                     <Container className="map-container">
-                        {this.props.onConfirm?<LeafletMap ref={(ref) => this.map = ref} style={{ height: "230px", width: "auto" }} center={position} zoom={this.state.zoom}>
+                        {this.props.onConfirm?<LeafletMap ref={(ref) => this.mapTaxista = ref} style={{ height: "230px", width: "auto" }} center={position} zoom={this.state.zoom}>
                             <TileLayer
                                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                 url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
