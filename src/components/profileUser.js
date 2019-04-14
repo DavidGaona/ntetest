@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
 import '../App.css';
-
-//importo componentes para formulario
+import { connect } from 'react-redux'
+//importo componentes
 import Container from 'react-bootstrap/Container'
 import MyInfo from './myInfo'
-import { connect } from 'react-redux'
 import Direcciones from './direcciones'
 import Mapa from './map'
 import MyDirections from './myDirections'
 
-class profileUser extends Component {
+/*
 
-    //Propiedades
-    constructor(props) {
-        super(props);
-        
-    }
+Componente que hace parte del React Router, este contiene a su vez los demas componentes que juntos forman el profile del usuario.
+
+*/
+
+class profileUser extends Component {
 
     render() {
         return (
@@ -33,6 +32,8 @@ class profileUser extends Component {
     }
 }
 
+
+// Conexión al store de redux 
 const mapStateToProps = state => ({
     ...state
 });

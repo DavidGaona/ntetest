@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
-import '../App.css';
-
-//importo componentes para formulario
+import React, { Component } from 'react'
+import '../App.css'
+// Importo componentes para formulario
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -15,9 +14,15 @@ import axios from 'axios'
 import { connect } from 'react-redux';
 import loginForm from '../redux/actions/loginForm'
 
+/*
+
+Componente que se usa para registrar un User  
+
+*/
+
 class FormUser extends Component {
 
-    //Propiedades
+    // Se inicializa el state y las funciones. 
     constructor(props) {
         super(props);
         this.state = { 
@@ -34,7 +39,7 @@ class FormUser extends Component {
         this.openForm = this.openForm.bind(this);
     }
 
-    //Evento controlador de solo ingreso de números
+    //Evento controlador de solo ingreso de números y de capturas los eventos de las cajas de texto
     onChanged(event,name) {
         let textR = event.target.value;
         switch(name){
@@ -66,10 +71,15 @@ class FormUser extends Component {
                     this.setState({
                         passText: textR
                     })
-                )                    
+                )
+            default: 
+             break;    
+                
         }
     }
 
+    // Función que recibe el evento (event: submit) del botón correspondiente a guardar del formulario de registro.
+    // automaticamente llama al formulario de inicio de sesión.
     submitForm(e) {
         e.preventDefault();
 
@@ -100,19 +110,21 @@ class FormUser extends Component {
                 lastNameText: '',
                 creditText: '',
                 passText: '',
-                result: 'Ha sucedido un error al momento de crear la cuenta \n'+`${error.response.data}`,
+                result: `Ha sucedido un error al momento de crear la cuenta \n ${error.response.data}`,
                 sucess: false
             });
             this.smShow();
         });
     }
 
+    // Función para abrir un aviso de confirmación 
     smShow(){
         this.setState({
             smShow:true
         })
     }
 
+    // Función para cerrar un aviso de confirmación
     smClose(){
         this.setState({
             smShow:false
@@ -122,6 +134,7 @@ class FormUser extends Component {
         }
     }
 
+    // Función que ejecuta un action de Redux correspondiente a desplegar el formulario de login
     openForm(){
         const { loginForm } = this.props;
         loginForm(true);
@@ -222,11 +235,12 @@ class FormUser extends Component {
     }
 }
 
-
+// Actions disponibles en Redux
 const mapDispatchToProps = {
     loginForm
 };
 
+// Conexión con el Store de Redux 
 const mapStateToProps = state => ({
     ...state
 });

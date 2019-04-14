@@ -6,6 +6,14 @@ import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import axios from 'axios'
 
+
+/* 
+
+Componente que se encarga de ejecutar el despliegue del formulario de calificación, el cual se basa en mostrar unas estrellas para calificar al usuario
+asi pues lo que se tiene es que al momento de ser llamado, este no se finaliza sino hasya que el usuario de click en alguna estrella.
+
+*/
+
 class Calificacion extends Component {
 
     //Propiedades
@@ -14,7 +22,9 @@ class Calificacion extends Component {
         this.calificar = this.calificar.bind(this);
     }
 
-
+    // Función que se encarga de capturar el evento de click (event: onClick) ejecutando una petición de post al servidor
+    // la cual consiste en calificar al taxista, por medio de unas estrellas que se despliegan en el componente.
+    // En este caso no se usa Redux, porque nuevamente el componente padre es quien tiene el control de la APP. 
     calificar(e){
         axios.post('http://localhost:8080/profile/calificarTaxista',{
             num: this.props.numCel,

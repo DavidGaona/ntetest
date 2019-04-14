@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
 import '../App.css';
 
+/* 
+
+Componente que muestra el footer
+
+*/
+
 class Footer extends Component {
     render() {
         return(

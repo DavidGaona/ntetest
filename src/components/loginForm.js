@@ -9,9 +9,15 @@ import { withRouter } from 'react-router-dom'
 import isAuthenticated from "../redux/actions/isAuthenticated";
 import axios from 'axios'
 
+/* 
+
+Componente que se encarga del despliegue del formulario de inicio de sesión usando el store de Redux .
+
+*/
+
 class LoginForm extends React.Component {
 
-
+    // Inicialización del state y funciones.
     constructor(props, context) {
       super(props, context);
       this.log = this.log.bind(this);
@@ -27,6 +33,8 @@ class LoginForm extends React.Component {
       }
     }
 
+    // Recibe un role (string, se recide desde un llamado desde un evento de click sobre un botón) el cual cambia el state del componente,
+    // para poder desplegarle al usuario el formulario correspondiente a User o a Taxista.
     changeRole(role){
       switch(role){
         case 'Usuario':
@@ -47,6 +55,8 @@ class LoginForm extends React.Component {
         
     }
 
+    // Función que captura event (event: onChange) y un name (string) el cual , dependiendo de name,
+    // captura todo lo correspondiente a su input.
     onChanged(event,name) {
         const textR = event.target.value
         switch(name){
@@ -59,12 +69,16 @@ class LoginForm extends React.Component {
                     this.setState({
                         passText: textR
                     })
-                )                    
+                )
+            default: 
+              break;                        
         }
       }
 
 
-
+    // Función que se llama al presionar en el botón de login, esta hace una petición post de login al server 
+    // el cual devuelve la info del usuario que posteriormente es guardada en el store de Redux para dar un estado global
+    // a la aplicación. 
     log(){
       
       if(this.state.role === 'Usuario'){
@@ -121,6 +135,7 @@ class LoginForm extends React.Component {
       
     }
 
+    // Cierra el formulario de login posteriormente cuando se ha realizado una acción o si se ha pinchado en cerrar.
     close(){
       this.setState({
         numText:'',
@@ -173,10 +188,12 @@ class LoginForm extends React.Component {
     }
   }
 
+  // Conexión con Redux
   const mapStateToProps = state => ({
       ...state
   });
 
+  // Actions disponibles de Redux
   const mapDispatchToProps = {
     isAuthenticated
   };

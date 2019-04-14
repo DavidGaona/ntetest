@@ -5,12 +5,13 @@ import '../App.css';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
-import Card from 'react-bootstrap/Card'
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip'
 
+/* 
+
+Componente que contiene los botones que dirigen a los path correspondientes al registro de sea usuario o taxista. 
+
+*/
 
 class Register extends Component {
 

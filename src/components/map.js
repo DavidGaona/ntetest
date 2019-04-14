@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import '../App.css';
+// Importaciones de la libreria de Leaflet
 import { Map as LeafletMap, TileLayer, Marker, Popup } from 'react-leaflet'
 import "leaflet/dist/leaflet.css";
 import L from 'leaflet';
+
 import Select from 'react-select';
 import axios from 'axios'
 import Row from 'react-bootstrap/Row'
@@ -17,16 +19,25 @@ import Button from 'react-bootstrap/Button'
 import updateDesde from '../redux/actions/updateDesde'
 import updateHasta from '../redux/actions/updateHasta'
 
-delete L.Icon.Default.prototype._getIconUrl;
 
+//Modificaciones al MAPA para poder que adquiera el estilo deseado. 
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
   shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
+/* 
+
+Componente que contiene toda la funcionalidad del mapa del usuario, el cual contiene una barra de direcciones para buscar,
+se anida otro componente que es el de pedirCarrera que contiene "desde" y "hasta" .
+
+*/
+
 
 class Mapa extends Component {
+  // inicialización de state,funciones y geolocation. 
   constructor(props) {
     super()
     this.state = {
@@ -48,13 +59,14 @@ class Mapa extends Component {
     navigator.geolocation.getCurrentPosition(this.showPosition);
   }
 
+  // Captura el evento (event: onChange) que captura el cambio de la caja de texto correspondiente a el nombre de la dir favorita
   onChanged(e){
     this.setState({
       name: e.target.value
     });  
   }  
 
-
+  // Captura el evento (event: submit) el cual se encarga de guardar las direcciones haciendo un post al servidor. 
    submitForm(e){
     e.preventDefault();
     const {logged} = this.props;
@@ -70,7 +82,9 @@ class Mapa extends Component {
     });
   }
 
-
+  // Función que se encarga de simular el buscador de Google maps o la adición de Geocoder anidado al mapa,
+  // en vez de esto se captura el texto a partir de un evento en una caja de tipo "Select" la cual se actualiza
+  // mediante esta función al hacer peticiones a la API de nominatin de OpenStreetMap cada vez que se presiona una tecla. 
   inputChange(text) {
     axios.get(`http://nominatim.openstreetmap.org/search?format=json&limit=4&q=${text}`, {
     }).then((res) => {
@@ -87,7 +101,8 @@ class Mapa extends Component {
 
   }
 
-
+  // Función que se encarga de mover el marquer en el mapa cuando el usuario a presionado enter para buscar la dirección.
+  // recibe entonces las coordenadas (JSON) para mover el marquer al punto especificado.
   handleChange = (selectedOptionAux) => {
     const { latitude, longitude } = { latitude: this.state.info[selectedOptionAux.value].lat, longitude: this.state.info[selectedOptionAux.value].lon }
     this.setState({
@@ -98,6 +113,7 @@ class Mapa extends Component {
     });
   }
 
+  // Callback que recibe las coordenadas (JSON) suministrada por el navegador.
   showPosition(positionCallBack) {
     this.setState({
       lat: positionCallBack.coords.latitude,
@@ -105,7 +121,8 @@ class Mapa extends Component {
       zoom: 13
     });
   }
-
+ 
+  // Llama el action de Redux el cual se encarga de llenar el campo "desde" del componente pedirCarrera
   addOrigen() {
     const {updateDesde} = this.props;
     axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.state.lat}&lon=${this.state.lng}`, {
@@ -120,6 +137,7 @@ class Mapa extends Component {
     });
   }
 
+  // Llama el action de Redux el cual se encarga de llenar el campo "hasta" del componente pedirCarrera
   addDestino() {
     const {updateHasta} = this.props;
     axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.state.lat}&lon=${this.state.lng}`, {
@@ -134,6 +152,7 @@ class Mapa extends Component {
     });
   }
 
+  // Se encarga de recibir el evento (event: onClick) que se da sobre el mapa haciendo que el marquer se mueva.
   changePosition(e) {
     this.setState({
       lat: e.latlng.lat,
@@ -201,12 +220,13 @@ class Mapa extends Component {
   }
 }
     
+// Actions disnponibles de Redux
 const mapDispatchToProps = {
   updateHasta,
   updateDesde 
 };
 
-
+// Conexión con Redux
 const mapStateToProps = state => ({
   logged: state.authenticated,
   origen: state.desdeDir,

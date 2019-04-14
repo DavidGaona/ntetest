@@ -8,8 +8,17 @@ import showDirectionsAction from '../redux/actions/showDirectionsAction'
 import Table from 'react-bootstrap/Table'
 import axios from 'axios';
 
+
+/* 
+
+COmponente que se encarga de desplegar las direcciones favoritas del usuario, esta hace uso del
+store de Redux.
+
+*/
+
 class MyDirections extends React.Component {
 
+  // Inicialización del state y funciones
 
   constructor(props, context) {
     super(props, context);
@@ -22,7 +31,8 @@ class MyDirections extends React.Component {
     };
   }
 
-  
+    // Función que se encarga de eliminar las direcciones seleccionadas (traidas desde el store de Redux), 
+    // esta operación se hace de forma sincrona (se resuelven todas las promesas). 
     async eliminarDirs(){
     const {showDirection,logged} = this.props;
     const storage = JSON.parse(localStorage.getItem('userInfo'));
@@ -52,8 +62,11 @@ class MyDirections extends React.Component {
     this.handleClose();
   }
 
+
+  //lifecycle React: Se llama para cuando ha terminado la función asincrona (callback) que resuelve los nombres de direcciones.
   componentWillReceiveProps(nextProps){
     const {showDirection} = nextProps;
+    //Se resuelven el array de promesas para luego enviar la info y desplegarla.
     Promise.all(showDirection.data).then((valores)=>{ 
       this.setState({
         info: valores
@@ -61,6 +74,7 @@ class MyDirections extends React.Component {
     })   
   }  
 
+  // función que se encarga de llamar al action de Redux que oculta el componente actual. 
   handleClose() {
     const {showDirectionsAction} = this.props;
     showDirectionsAction(false,[],[]);    
@@ -106,11 +120,13 @@ class MyDirections extends React.Component {
       }
     }
 
+    // conexión con el store de Redux
     const mapStateToProps = state => ({
         logged: state.authenticated,
         showDirection: state.showDirection
     });
     
+    // actions disponibles de Redux
     const mapDispatchToProps = {
         showDirectionsAction
     };

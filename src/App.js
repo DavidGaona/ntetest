@@ -1,23 +1,17 @@
 import React, { Component } from 'react';
 import './App.css';
 import Routes from './router'
+/* Componente principal desde donde arranca la app
 
-import Navbar from 'react-bootstrap/Navbar'
-import Brand from 'react-bootstrap/NavbarBrand'
-import Nav from 'react-bootstrap/Nav'
-import Link from 'react-bootstrap/NavLink'
-import Button from 'react-bootstrap/Button'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
-import LoginForm from './components/loginForm'
-//importo barra de navegación negra
-import  NavbarBlack from './components/navbarBlack';
-
+Se importa el componente Routes que contiene el enrutador de React Router DOM,
+como tambien los estilos .css a partir de ./App.css que se usara en todos los demas components. 
+*/ 
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <Routes></Routes>
+        <Routes></Routes> 
       </div>
     );
   }

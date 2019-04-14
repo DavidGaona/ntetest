@@ -7,20 +7,21 @@ import { withRouter } from 'react-router-dom'
 import Main from '../components/main'
 import Servicios from '../components/services'
 import Register from '../components/register'
-//import { throws } from 'assert';
 
+/* 
+
+Se hace basicamente lo mismo que las demas routes.
+
+*/
 
 class Welcome extends Component {
 
-  constructor(props){
-    super(props);    
-
+  componentWillMount(){
     const {authenticated} = this.props;
 
     if(authenticated.loggedIn){
       this.props.history.push('/profile');  
     }
-
   }
 
   render() {

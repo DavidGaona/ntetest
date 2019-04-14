@@ -10,6 +10,12 @@ import Button from 'react-bootstrap/Button'
 import PedirCarrera from './pedirCarrera'
 import initialStateViajes from '../redux/actions/initialStateViajes'
 
+/* 
+
+Componente que se encarga de mostrar la información referente a pedir una carrera: Como el "desde" y el "hasta" como el botón que 
+desencadena la acción de solicitar el servicio. 
+
+*/
 
 class FormGetTaxi extends Component {
 
@@ -19,6 +25,8 @@ class FormGetTaxi extends Component {
         this.pedirCarrera = this.pedirCarrera.bind(this);   
     }
 
+    // Función que ejecuta una request POST al servidor para solicitar una carrera, se usan las coordenadas (json)
+    // le han mandado desde el store de Redux (dado que estas se pueden obtener desde el mapa o desde las direcciones favoritas).
     pedirCarrera(){
         const {dirDestino,dirOrigen,logged,initialStateViajes} = this.props;
         axios.post('http://localhost:8080/profile/pedirCarrera',{
@@ -66,12 +74,12 @@ class FormGetTaxi extends Component {
     }
 }
 
-
+// Actions disponibles de Redux
 const mapDispatchToProps = {
     initialStateViajes
 };
 
-
+// Conexión con el store de Redux
 const mapStateToProps = state => ({
     logged: state.authenticated 
 });

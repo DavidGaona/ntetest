@@ -1,17 +1,22 @@
-import React, { Component } from 'react';
-import '../App.css';
-
-import Container from 'react-bootstrap/Container'
-import MyInfo from './myInfo'
-import CarInfo from './carInfo'
+import React, { Component } from 'react'
+import '../App.css'
 import { connect } from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import axios from 'axios'
+// Importo componentes
 import Carrera from './carrera'
+import MyInfo from './myInfo'
+import CarInfo from './carInfo'
+
+/* 
+
+Componente que toma el React Router sobre el perfil del conductor, este a su vez otros componentes que juntos forman el perfil del conductor.
+
+*/
 
 class profileDriver extends Component {
 
-
+    //Constructor para inicializar el estado y funciones.
     constructor(props) {
         super(props);
         this.state = {
@@ -32,13 +37,15 @@ class profileDriver extends Component {
     }
 
 
-
+    // Función que usa la localización del usuario tomada desde la opción del navegador, devuelve un callback promiseTerminarCarrera
     terminarCarrera(){
         navigator.geolocation.getCurrentPosition(this.promiseTerminarCarrera);
     }
 
+    // Callback que recibe los argumentos (JSON) del navegador y se hace una petición al servidor notificando
+    // que ya se ha terminado la carrera por medio de una post request. 
     promiseTerminarCarrera(callbackArg){
-        const {logged} = this.props;
+        const {logged} = this.props; // Estado de autenticación . 
         axios.post('http://localhost:8080/taxista/terminarCarrera',{
             id_taxista: logged.user.taxista.idTaxista,
             coordsF:`(${callbackArg.coords.longitude},${callbackArg.coords.latitude})`
@@ -60,6 +67,7 @@ class profileDriver extends Component {
         })   
     }
 
+    //Función que confirma la carrera, enviando la petición post request al servidor. 
     confirmarCarrera(){
         const {logged} = this.props;
         axios.post('http://localhost:8080/taxista/confirmarServicio',{
@@ -78,9 +86,11 @@ class profileDriver extends Component {
         });        
     }
 
+    //Función que se ejecuta como callback del setInterval que se ejecuta para verificar cada tanto de tiempo si hay
+    // disponible una carrera para tomarla. Esto se hace por medio de un post request. 
     buscarCarrera(){
         const {logged} = this.props;
-        const storage = JSON.parse(localStorage.getItem('userInfo'));
+        const storage = JSON.parse(localStorage.getItem('userInfo')); // Se obtiene el objeto firmado en el localstorage
         axios.post('http://localhost:8080/taxista/buscarServicio',{
             id_taxista: logged.user.taxista.idTaxista
         },{
@@ -99,23 +109,27 @@ class profileDriver extends Component {
         });
     }
 
+    //lifecyle React: Revisa el estado de la app para saber si ejecuta buscarCarrera. 
     componentDidUpdate(){
         if(this.state.enServicio && !(this.state.enCarrera) && !(this.state.onConfirm)){
             this.interval = setInterval(this.buscarCarrera,3000);    
         }
     }
 
-
+    //lifecyle React: Revisa el estado de la app para saber si ejecuta buscarCarrera. 
     componentDidMount(){
         if(this.state.enServicio && !(this.state.enCarrera) && !(this.state.onConfirm)){
             this.interval = setInterval(this.buscarCarrera,3000);    
         }
     }
 
+    // Limpia las subscripción al callback de setInterval.  
     componentWillUnmount(){
         clearInterval(this.interval);
     }
     
+    //lifecyle React: Se obtiene el estado de la aplicación para saber si el usuario estaba en alguna de las etapas de una carrera,
+    // esto se hace por medio de una GET request. 
     componentWillMount(){ 
         const {logged} = this.props;
         const storage = JSON.parse(localStorage.getItem('userInfo'));
@@ -166,9 +180,11 @@ class profileDriver extends Component {
           });
     }
 
+    //Callback que es llamado cuando se le solicita al usuario su posición recibiendo un callaback (JSON) para ponerse disponible para una carrera.
+    // esto mediante una post request.
     start(callbackArg){
         const {logged} = this.props;
-        const placaValue = window.prompt("Digite el numero de la placa",'false'); 
+        const placaValue = window.prompt("Digite el numero de la placa",''); // Se le pregunta la placa al user
         axios.post('http://localhost:8080/taxista/comenzarServicio',{
             id_taxista:logged.user.taxista.idTaxista,
             coordsTaxista:`(${callbackArg.coords.longitude},${callbackArg.coords.latitude})`,
@@ -187,6 +203,8 @@ class profileDriver extends Component {
         });
     }
 
+    //Función que toma un flag (boolean) y llama a una función que llama al callback start pasandole como parametros las coordenadas
+    // que da el navegador o sino se termina el servicio notificandole al servidor por medio de una PUT request.
     service(flag){
         if(flag){
             navigator.geolocation.getCurrentPosition(this.start,(err) => {
@@ -218,6 +236,8 @@ class profileDriver extends Component {
         }
     }
 
+    // Función que activa el estado del taxista poniendo el botón de la interfaz en su respectivo color. 
+    // revisa el estado del botón para saber localmente si esta en servicio (localmente en el sentido de que no se le pregunta al Backend durante este paso). 
     activarTaxi() {
         if (this.state.estado === "ACTIVAR") {
             this.service(true);
@@ -228,8 +248,8 @@ class profileDriver extends Component {
     }
     render() {
         return (
-            <header className="usuario_open">
-                <Container className="App-padding-top">
+            <div className="usuario_open">
+                
                     <MyInfo></MyInfo>
                     <CarInfo></CarInfo>
                     <Carrera userInfo={this.state.userInfo} onConfirm={this.state.onConfirm} enCarrera={this.state.enCarrera} confirmarCarrera={this.confirmarCarrera} terminarCarrera={this.terminarCarrera}></Carrera>
@@ -242,14 +262,13 @@ class profileDriver extends Component {
                             <h2>{this.state.estado}</h2>
                         </Button>
                     </div>
-                </Container>
-            </header>
-
+            </div>
 
         );
     }
 }
 
+// Conexión al Store de Redux. 
 const mapStateToProps = state => ({
     logged: state.authenticated
 });

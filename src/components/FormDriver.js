@@ -14,6 +14,12 @@ import { connect } from 'react-redux';
 import loginForm from '../redux/actions/loginForm'
 import Modal from 'react-bootstrap/Modal'
 
+/*
+
+Componente que se encarga de desplegar el formulario correspondiente al conductor de taxi
+
+*/
+
 class FormDriver extends Component {
 
     //Propiedades
@@ -35,17 +41,20 @@ class FormDriver extends Component {
         this.openForm = this.openForm.bind(this);
     }
 
+    // Función que ejecuta una action de Redux el cual se encarga de desplegar el formulario de login
     openForm(){
         const { loginForm } = this.props;
         loginForm(true);
     }
 
+    // Encargado de mostrar un aviso de confirmación
     smShow(){
         this.setState({
             smShow:true
         })
     }
 
+    // Encargado de cerrar un aviso de confirmación
     smClose(){
         this.setState({
             smShow:false
@@ -55,7 +64,7 @@ class FormDriver extends Component {
         }
     }
 
-    //Evento controlador de solo ingreso de números
+    //Evento controlador de solo ingreso de números y de capturas los eventos de cada caja de texto
     onChanged(event, name) {
         let textR = event.target.value;
         switch (name) {
@@ -96,9 +105,14 @@ class FormDriver extends Component {
                     })
                 );
 
+            default: 
+             break;    
+
         }
     }
 
+    // Función que captura un evento (event: submit) con el cual se registra un conductor de taxi, esto mediante
+    // una petición post al servidor. 
     submitForm(e){
         e.preventDefault();
         axios.post('http://localhost:8080/signin/driver',
@@ -129,7 +143,7 @@ class FormDriver extends Component {
                 lastNameText: '',
                 creditText: '',
                 passText: '',
-                result: 'Ha sucedido un error al momento de crear la cuenta \n'+`${error.response.data}`,
+                result: `Ha sucedido un error al momento de crear la cuenta \n ${error.response.data}`,
                 sucess: false
             });
         });
@@ -243,10 +257,13 @@ class FormDriver extends Component {
         );
     }
 }
+
+// Actions disponibles de Redux
 const mapDispatchToProps = {
     loginForm
 };
 
+// Conexión con el store de Redux
 const mapStateToProps = state => ({
     ...state
 });

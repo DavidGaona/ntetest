@@ -21,8 +21,15 @@ import showCarInfo from '../redux/actions/showCarInfo'
 import Form from 'react-bootstrap/Form'
 import { withRouter } from 'react-router-dom'
 
+/* 
+
+Componente que contiene la barra de navegación, donde se puede encontrar las ventas, links a registro y el botón de log/out. 
+Este componente no desaparece de la pantalla, puesto que es el componente que se encuentra fuera de la navegación de React Router.
+*/
+
 class NavbarBlack extends Component {
 
+    // Inicialización de funciones.
     constructor(props){
         super(props);
         this.openForm = this.openForm.bind(this);
@@ -35,6 +42,8 @@ class NavbarBlack extends Component {
         this.handler = this.handler.bind(this);
     }
 
+    // Función que se encarga del evento de click (event: onClick) en el cual se selecciona las direcciones a borrar y se le pasan 
+    // como un push al estado del store de redux.    
     handler(e){
         const {dirsInfo} = this.props;
         if(e.target.checked){
@@ -49,11 +58,14 @@ class NavbarBlack extends Component {
         }
     }
 
+    //Función que se encarga de llamar al action de Redux encargado de mostrar el registro del taxi.
     showcarInfo(){
         const {showCarInfo} = this.props;
         showCarInfo(true);
     }
 
+    // Función que recibe ln (coord JSON) , lat (coord JSON) y realiza una petición al servidor mediante un get request a la API de Nominatin (OpenStreetMaps)
+    // para obtener los nombres. 
     searchDir(ln,lat){
         return axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${ln}`, {
         }).then((res) => {
@@ -63,7 +75,7 @@ class NavbarBlack extends Component {
         });    
     }
     
-
+    // Función que se encarga de hacer una petición get al servidor para obtener la información de las direcciones y desplegar una tabla de cada dirección favorita del user.
     async showDirForm(){
         let dirs = [];
         const storage = JSON.parse(localStorage.getItem('userInfo'));
@@ -98,6 +110,8 @@ class NavbarBlack extends Component {
 
     }
 
+    // Función que realiza una petición get al servidor solicitando la información del usuario para luego usar
+    // la action de Redux y mostrar el componente que despliega la info del usuario o taxista.
     showInfo(){
         const storage = JSON.parse(localStorage.getItem('userInfo'));
         const {showInfoAction,logged} = this.props;
@@ -132,17 +146,20 @@ class NavbarBlack extends Component {
         }  
     }
 
+    // Función que abre el formulario de login por medio del llamado al actions de Redux encargado del estado del componente. 
     openForm(){
         const { loginForm } = this.props;
         loginForm(true);
     }
 
+    // Función que cierra el formulario de login por medio del llamado al actions de Redux encargado del estado del componente. 
     closeForm(){
         const {loginForm} = this.props;
         loginForm(false);    
     }
 
-
+    // Función que llama al action de Redux encargado de eliminar la info grabada en el localstorage y "purga" el storage de la sesión anterior.
+    // Luego usando el WithRouter redirige a la pagina principal. 
     logOut(){
         const {isLogOut} = this.props;
         isLogOut();
@@ -177,7 +194,7 @@ class NavbarBlack extends Component {
 
 
 
-
+// Conexion con el store de Redux
 const mapStateToProps = state => ({
     ...state,
     logged: state.authenticated,
@@ -185,6 +202,7 @@ const mapStateToProps = state => ({
     dirsInfo: state.showDirection
 });
 
+// Actions disponibles para modificar el store de Redux
 const mapDispatchToProps = {
     isLogOut,
     loginForm,

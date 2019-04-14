@@ -7,21 +7,28 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import { connect } from 'react-redux'
+import axios from 'axios'
 import showInfoAction from '../redux/actions/showInfoAction'
 import isAuthenticated from '../redux/actions/isAuthenticated'
 import isLogOut from '../redux/actions/isLogOut'
-import axios from 'axios'
+
+
+/*
+
+Componente encargado de desplegar la información del usuario o taxista.
+
+*/
 
 class myInfo extends React.Component {
 
-
+  // inicialización del state y de funciones.
   constructor(props, context) {
     super(props, context);
     this.handleClose = this.handleClose.bind(this);
     this.handlerChange = this.handlerChange.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
     this.onChanged = this.onChanged.bind(this);
-    this.pagar = this.pagar.bind(this);
+    this.reiniciarCont = this.reiniciarCont.bind(this);
     this.state = {
       textNombre: '',
       textApellido: '',
@@ -32,12 +39,13 @@ class myInfo extends React.Component {
     }
   }
 
-
-  pagar(){
+  // Función que realiza una petición put al servidor notificando que el usuario decidio pagar o
+  // si es taxista entonces decidio cobrar. 
+  reiniciarCont(){
     const {showInfo} = this.props;
     const storage = JSON.parse(localStorage.getItem('userInfo'));
     if(storage.usuario){
-      axios.put('http://localhost:8080/profile/updateUser',{
+      axios.put('http://localhost:8080/profile/pagar',{
         num: showInfo.data[0].numero_de_celular
       },
       {headers: {Authorization: storage.token}
@@ -66,7 +74,9 @@ class myInfo extends React.Component {
 
   }
 
-
+  // Función que captura el evento de cambio (event: onChange) en las cajas de texto y actualiza el state
+  // para capturar el value (que representa la información a capturar) proveniente del formulario que pregunta 
+  // por num_cel mas contraseña.
   onChanged(e,name){
     const textR = e.target.value
         switch(name){
@@ -79,20 +89,24 @@ class myInfo extends React.Component {
                     this.setState({
                         passText: textR
                     })
-                )                    
+                )
+                
+            default:
+                    break;
         }
 
   }
 
+  // Función que captura el evento de "submit" (event: onSubmit) producido por el formulario que pregunta 
+  // por la autenticación del usuario que desea eliminar el usuario. 
   submitForm(e){
     e.preventDefault();
-    const storage = JSON.parse(localStorage.getItem('userInfo'));
     const r = window.confirm("¿Esta seguro que quiere eliminar la cuenta?");
     if(r){
       axios.delete('http://localhost:8080/profile/deleteUser',{data:{
         num: this.state.numText,
         pass: this.state.passText 
-      }, headers: {Authorization: storage.token}})
+      }})
       .then((res) => {
         const {isLogOut} = this.props;
         isLogOut();
@@ -110,6 +124,8 @@ class myInfo extends React.Component {
     } 
   }
 
+  // Función que realiza una petición put al servidor con el fin de realizar un cambio en el nombre y apellido del user o taxista,
+  // se capturan los datos a partir del state que contiene los parametros a considerar. 
   saveChanges(e){
     const {showInfo,isAuthenticated,showInfoAction} = this.props;
     const storage = JSON.parse(localStorage.getItem('userInfo'));
@@ -150,11 +166,11 @@ class myInfo extends React.Component {
         console.log(err.response.data);  
       })
       }else{
-        axios.put('http://localhost:8080/taxista/updateTaxista',{data:{
+        axios.put('http://localhost:8080/taxista/updateTaxista',{
           id_taxista: storage.taxista.idTaxista,
           nombre: this.state.textNombre,
           apellido: this.state.textApellido 
-        }, headers: {Authorization: storage.token}})
+        }, {headers: {Authorization: storage.token}})
         .then((res) => {
           window.alert("Usuario actualizado con éxito");
           const taxista = {
@@ -169,6 +185,13 @@ class myInfo extends React.Component {
             token: storage.token,
             taxista   
           });
+          this.setState({
+            textNombre: '',
+            textApellido: '',
+            modif: false
+          });
+  
+          showInfoAction(false,{});
         })
         .catch((err) => {
           console.log(err.response.data);
@@ -184,6 +207,8 @@ class myInfo extends React.Component {
     }  
   }
 
+  // función que captura el evento (event: onChange) de las cajas de texto correspondientes a la funcionalidad
+  // de modificar la información del usuario o taxista.
   handlerChange(e){
     const textR = e.target.value;
     const id = e.target.id;
@@ -198,10 +223,15 @@ class myInfo extends React.Component {
         this.setState({
           textApellido: textR
         });
+        break; 
+        
+      default: 
         break;  
+
     }      
   }
 
+  // Función que mediante un actions de Redux cierra (show: false) este componente. 
   handleClose() {
     const {showInfoAction} = this.props;
     showInfoAction(false,{});    
@@ -303,7 +333,7 @@ class myInfo extends React.Component {
                           <br />
                           <br />
                           <br />
-                          <Button variant="success" onClick={this.pagar}>
+                          <Button variant="success" onClick={this.reiniciarCont}>
                           <i className="fas fa-money-check-alt fa-3x"></i>
                             {showInfo.data.role === "User"? "Pagar":"Cobrar"}</Button>
                         </ButtonGroup>
@@ -326,11 +356,13 @@ class myInfo extends React.Component {
       }
     }
 
+    // Conexión con el state de Redux
     const mapStateToProps = state => ({
         ...state,
         showInfo: state.showInfo
     });
     
+    // actions disponibles para cambiar el store
     const mapDispatchToProps = {
         showInfoAction,
         isAuthenticated,

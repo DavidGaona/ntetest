@@ -5,13 +5,13 @@ import '../App.css';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
-import Card from 'react-bootstrap/Card'
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip'
 
+/*
 
+Componente que hace parte del NavBar el cual se basa en mostrar las ventajas de la aplicación y el registro, haciendo uso
+de un "ancla" para poder llevar al usuario a cada botón de registro o a la info.  
+
+*/
 class Servicios extends Component {
 
     render() {

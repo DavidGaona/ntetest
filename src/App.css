@@ -119,7 +119,8 @@
 .App-header-mainTaxi{
   background-image: url("../src/img/map-D2x_v2.webp");
   width: 100%;
-  height: 600px;
+  height: 900px;
+  background-size: cover;
   padding-bottom: 150px;
   padding-top: 110px;
   display: flex;

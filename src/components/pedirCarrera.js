@@ -1,18 +1,23 @@
 import React, { Component } from 'react'
 import '../App.css';
-import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { connect } from 'react-redux'
 import axios from 'axios'
-import initialStateViajes from '../redux/actions/initialStateViajes'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Calificacion from './calificacion'
+import initialStateViajes from '../redux/actions/initialStateViajes'
 
+/* 
+
+Componente que contiene todo lo relacionado a las cajas de texto de la interfaz que contienen las direcciones de "hasta" y "desde"
+como tambien tiene toda la funcionalidad de pedir un taxi hasta terminar una carrera. 
+
+*/
 class PedirCarrera extends React.Component {
 
-
+  // Se inicializan el state y las funciones. 
   constructor(props, context) {
     super(props, context);
     this.confirmar = this.confirmar.bind(this);
@@ -28,11 +33,15 @@ class PedirCarrera extends React.Component {
     };
   }
 
+  // Función que oculta el componente encargado de la carrera.
   handleClose(){
     const {initialStateViajes} = this.props;
         initialStateViajes({sePidio: false, seConfirmo: false, calificar:false});
   }
 
+  // Función que se ejecuta como callback de setInterval, la cual se encarga de hacerle una petición POST al server
+  // preguntando si se ha terminado la carrera (es decir, si el taxista ha llegado al destino). 
+  // Esta función despliega el costo de la carrera como tambien activa la calificación. 
   terminar(){
     const {logged,initialStateViajes} = this.props;
     axios.post('http://localhost:8080/profile/notificarCarreraTerminada',{
@@ -50,6 +59,8 @@ class PedirCarrera extends React.Component {
     });   
   }
 
+  // Función que se jecuta como callback en el setInterval preguntando al server con una Post request,
+  // si ya el taxista ha confirmado la carrera. Hace un update al estado poniendo la confirmación como "true".
   confirmar(){
     const {logged,initialStateViajes} = this.props;
     axios.post('http://localhost:8080/profile/confirmarCarrera',{
@@ -74,7 +85,7 @@ class PedirCarrera extends React.Component {
     })      
   }
 
-
+  // lifecycle React: Se llama antes de montar el componente para poder obtener el estado de la aplicación, si se encuentra en alguna etapa de carrera.
   componentWillMount(){ 
       const {initialStateViajes,logged} = this.props;
       const storage = JSON.parse(localStorage.getItem('userInfo'));
@@ -117,6 +128,7 @@ class PedirCarrera extends React.Component {
         });
   }
 
+  //lifecycle React: Se ejecuta cuando se le pasan propiedades al componente, con estas se ejecutan los callback confirmar o terminar cada 3 segundos. 
   componentWillReceiveProps(nextProps){
     
     if(nextProps.globalState.payload.sePidio && !(nextProps.globalState.payload.seConfirmo)){
@@ -127,6 +139,7 @@ class PedirCarrera extends React.Component {
     }       
   }
 
+  // Se cancela la suscripción a algun callback de setInterval. 
   componentWillUnmount() {
     clearInterval(this.interval);
   }
@@ -187,11 +200,12 @@ class PedirCarrera extends React.Component {
       }
     }
 
-
+    // Conecta las acciones que se pueden ejecutar para cambiar el estado del store de Redux
     const mapDispatchToProps = {
-        initialStateViajes
+        initialStateViajes //función que controla el estado de la aplicación en alguna etapa de carrera.
     };
 
+    //conexion al store de redux 
     const mapStateToProps = state => ({
         logged: state.authenticated,
         globalState: state.initialStateViajes

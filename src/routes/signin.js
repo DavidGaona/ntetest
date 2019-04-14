@@ -7,26 +7,27 @@ import { withRouter } from 'react-router-dom'
 import FormUser from '../components/formUser'
 import FormDriver from '../components/FormDriver'
 
+/* 
+
+Se tiene el Footer, FormUser, FormDriver con los que se pretende mostrar una pantalla de registro para cada caso
+
+*/
 
 class Signin extends Component {
 
+    // Se usa el constructor para definir unas funciones asi como el estado . 
     constructor(props){
         super(props);
-        this.state = {text:''}
-        this.onChanged = this.onChanged.bind(this);
         this.customForm = this.customForm.bind(this);
+    }
+
+    //lifycycle React: Se llama antes de montar el componente al DOM y se verifica si se encuentra autenticado. 
+    componentWillMount(){
         const {authenticated} = this.props;
 
         if(authenticated.loggedIn){
-            this.props.history.push('/profile');
+            this.props.history.push('/profile'); //Redirección a /profile
         }
-    }
-
-    onChanged(event){
-        let textR = event.target.value;
-        this.setState({
-        text: textR.replace(/[^0-9]/g, '')
-        });
     }
 
 
@@ -39,7 +40,7 @@ class Signin extends Component {
         );    
     }
 
-
+    // Función que dependiendo del role (string) devuelve un componente. 
     customForm(role) {
         if (role === 'Usuario') {
             return (
@@ -56,7 +57,7 @@ class Signin extends Component {
 
 }
 
-
+//Conexión con el store de Redux 
 const mapStateToProps = state => ({
     ...state,
     authenticated: state.authenticated

@@ -8,9 +8,15 @@ import showCarInfo from '../redux/actions/showCarInfo'
 import Col from 'react-bootstrap/Col'
 import axios from 'axios';
 
+/* 
+
+Componente que se encarga del registro de un taxi a la app. 
+
+*/
 
 class CarInfo extends React.Component {
-
+    
+    // Inicialización de state y funciones
     constructor(props){
         super(props);
         let dt = new Date();
@@ -26,6 +32,7 @@ class CarInfo extends React.Component {
         }
     }
 
+    // Función que se encarga del evento (event: onChange) y recibe un role (string) que captura los valores de las cajas de texto
     onChanged(e,role){
       const value = e.target.value; 
       switch(role){
@@ -64,11 +71,13 @@ class CarInfo extends React.Component {
       }
     }
 
+    // Haciendo uso de una action de Redux, cierra el componente. 
     handleClose(){
         const {showCarInfo} = this.props;
         showCarInfo(false);
     }
 
+    // Captura el evento de submit (event: submit) el cual ejecuta una petición post al servidor para crear un taxi 
     submitForm(e){
       e.preventDefault();
       axios.post('http://localhost:8080/taxista/registrarTaxi',{
@@ -149,11 +158,13 @@ class CarInfo extends React.Component {
             );
           }
         }
-    
+        
+        // Conexión con el state de Redux
         const mapStateToProps = state => ({
             showCarForm: state.activarCarInfo
         });
         
+        // Actions disponible de Redux
         const mapDispatchToProps = {
             showCarInfo
         };
